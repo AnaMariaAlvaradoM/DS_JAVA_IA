@@ -1,4 +1,3 @@
-package Clase2;
 
 public class otraClase {
     public static void main(String[] args) {
