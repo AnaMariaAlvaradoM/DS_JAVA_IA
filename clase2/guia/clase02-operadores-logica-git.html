@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 2 · Java AI Engineer — Operadores, lógica y Git</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --dev-principal:#5418CC;
+  --dev-vibrante:#6018F0;
+  --dev-oscuro:#3C1884;
+  --bg-0:#0b0712;
+  --bg-1:#120c1f;
+  --bg-2:#1a1228;
+  --bg-card:#181023;
+  --bg-card-2:#1f1530;
+  --border:#2c2140;
+  --border-soft:#241936;
+  --txt:#ECE7F5;
+  --txt-dim:#A99FC0;
+  --txt-faint:#7a6f93;
+  --accent:#8B5CF6;
+  --accent-bright:#A78BFA;
+  --good:#34d399;
+  --warn:#fbbf24;
+  --danger:#fb7185;
+  --code-bg:#0d0916;
+  --sidebar-w:288px;
+  --maxw:920px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg-0);
+  color:var(--txt);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(900px 500px at 12% -5%, rgba(96,24,240,.18), transparent 60%),
+    radial-gradient(700px 500px at 100% 100%, rgba(84,24,204,.13), transparent 55%);
+}
+
+/* ============ SIDEBAR ============ */
+.sidebar{
+  position:fixed;top:0;left:0;height:100vh;width:var(--sidebar-w);
+  background:linear-gradient(180deg,var(--bg-1),var(--bg-0));
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;z-index:100;
+  transition:transform .28s ease;
+}
+.brand{padding:24px 22px 18px;border-bottom:1px solid var(--border-soft)}
+.brand .eyebrow{
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--accent-bright);font-weight:500;
+}
+.brand h1{font-size:18px;font-weight:800;margin-top:6px;letter-spacing:-.02em}
+.brand .sub{font-size:12.5px;color:var(--txt-dim);margin-top:4px}
+.brand .badge{
+  display:inline-flex;align-items:center;gap:6px;margin-top:12px;
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:500;
+  background:rgba(96,24,240,.16);color:var(--accent-bright);
+  border:1px solid rgba(139,92,246,.35);padding:4px 10px;border-radius:99px;
+}
+
+.nav{flex:1;overflow-y:auto;padding:12px 12px 8px}
+.nav::-webkit-scrollbar{width:6px}
+.nav::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+.nav-item{
+  display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+  background:none;border:none;color:var(--txt-dim);cursor:pointer;
+  padding:9px 12px;border-radius:10px;font-size:13.5px;font-weight:500;
+  font-family:inherit;transition:.16s;position:relative;
+}
+.nav-item .ico{
+  width:30px;height:30px;flex:none;display:grid;place-items:center;
+  font-size:15px;border-radius:8px;background:var(--bg-2);
+  border:1px solid var(--border-soft);transition:.16s;
+}
+.nav-item .label{flex:1;line-height:1.25}
+.nav-item:hover{color:var(--txt);background:var(--bg-2)}
+.nav-item.active{color:#fff;background:linear-gradient(90deg,rgba(96,24,240,.22),rgba(96,24,240,.05))}
+.nav-item.active .ico{background:var(--dev-vibrante);border-color:var(--dev-vibrante);box-shadow:0 4px 14px rgba(96,24,240,.5)}
+.nav-item.active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:99px;background:var(--accent-bright)}
+.nav-item .check{font-size:11px;color:var(--good);opacity:0;transition:.16s}
+.nav-item.seen .check{opacity:1}
+
+.sidebar-foot{padding:14px 16px;border-top:1px solid var(--border-soft)}
+.progress-wrap{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--txt-faint);font-family:'JetBrains Mono',monospace;margin-bottom:7px}
+.progress-track{height:6px;background:var(--bg-2);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--dev-principal),var(--accent-bright));transition:width .4s ease}
+.present-btn{
+  margin-top:14px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(135deg,var(--dev-vibrante),var(--dev-principal));
+  color:#fff;border:none;font-family:inherit;font-weight:600;font-size:13px;
+  padding:11px;border-radius:11px;cursor:pointer;transition:.16s;
+}
+.present-btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(96,24,240,.4)}
+
+/* ============ MAIN ============ */
+.main{margin-left:var(--sidebar-w);min-height:100vh;padding:0 0 80px}
+.topbar{
+  display:none;position:sticky;top:0;z-index:60;
+  background:rgba(11,7,18,.86);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:12px 16px;
+  align-items:center;justify-content:space-between;
+}
+.topbar h2{font-size:15px;font-weight:700}
+.hamburger{background:var(--bg-2);border:1px solid var(--border);color:var(--txt);width:40px;height:40px;border-radius:10px;font-size:18px;cursor:pointer}
+
+.section{
+  display:none;max-width:var(--maxw);margin:0 auto;padding:48px 40px 0;
+  animation:fade .4s ease;
+}
+.section.visible{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.sec-eyebrow{
+  display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-bright);font-weight:500;
+}
+.sec-eyebrow .num{
+  background:var(--bg-2);border:1px solid var(--border);border-radius:7px;
+  padding:2px 9px;color:var(--txt-dim);
+}
+.sec-title{font-size:33px;font-weight:800;letter-spacing:-.025em;margin:14px 0 8px;line-height:1.12}
+.sec-title .emoji{margin-right:8px}
+.sec-lead{font-size:16.5px;color:var(--txt-dim);max-width:680px;margin-bottom:26px}
+
+.h3{font-size:19px;font-weight:700;margin:30px 0 12px;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.h3::before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--dev-vibrante),var(--dev-principal))}
+p.body{color:var(--txt-dim);margin-bottom:14px;font-size:15.5px}
+p.body strong,li strong{color:var(--txt);font-weight:600}
+.main code:not(pre code){
+  font-family:'JetBrains Mono',monospace;font-size:.88em;
+  background:var(--bg-2);border:1px solid var(--border-soft);
+  padding:1px 6px;border-radius:6px;color:var(--accent-bright);
+}
+
+/* cards */
+.card{
+  background:var(--bg-card);border:1px solid var(--border);border-radius:16px;
+  padding:22px 24px;margin:18px 0;
+}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.def-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
+.def-card .tag{
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;font-weight:600;margin-bottom:9px;display:inline-block;
+}
+.def-card.tech .tag{color:var(--accent-bright)}
+.def-card.real .tag{color:var(--good)}
+.def-card h4{font-size:15px;font-weight:700;margin-bottom:6px}
+.def-card p{font-size:14px;color:var(--txt-dim)}
+
+/* tip / warn banners */
+.banner{
+  display:flex;gap:13px;border-radius:13px;padding:15px 18px;margin:18px 0;
+  border:1px solid;font-size:14.5px;align-items:flex-start;
+}
+.banner .b-ico{font-size:19px;flex:none;line-height:1.4}
+.banner .b-body{color:var(--txt-dim)}
+.banner .b-body b{color:var(--txt)}
+.banner.tip{background:rgba(96,24,240,.09);border-color:rgba(139,92,246,.32)}
+.banner.warn{background:rgba(251,191,36,.07);border-color:rgba(251,191,36,.28)}
+.banner.warn b{color:var(--warn)}
+.banner.data{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.25)}
+.banner.data b{color:var(--good)}
+
+/* question (collapsed answer) */
+.q{
+  border:1px solid var(--border);border-radius:14px;margin:16px 0;overflow:hidden;
+  background:linear-gradient(180deg,var(--bg-card-2),var(--bg-card));
+}
+.q-head{display:flex;gap:12px;padding:17px 20px;align-items:flex-start}
+.q-head .q-mark{
+  flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+  background:var(--dev-vibrante);color:#fff;font-weight:800;font-size:15px;
+  box-shadow:0 4px 12px rgba(96,24,240,.4);
+}
+.q-head .q-text{font-size:15.5px;font-weight:600;color:var(--txt);padding-top:3px}
+.q-reveal{
+  margin:0 20px 18px 62px;background:none;border:1px dashed var(--accent);
+  color:var(--accent-bright);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;
+  padding:8px 15px;border-radius:9px;cursor:pointer;transition:.16s;letter-spacing:.04em;
+}
+.q-reveal:hover{background:rgba(139,92,246,.12)}
+.q-ans{
+  margin:0 20px 18px 62px;padding:0 16px;max-height:0;overflow:hidden;
+  background:var(--code-bg);border-radius:11px;border:1px solid transparent;
+  transition:max-height .35s ease,padding .35s ease,border-color .35s;
+  color:var(--txt-dim);font-size:14.5px;
+}
+.q-ans.open{max-height:400px;padding:15px 16px;border-color:var(--border)}
+.q-ans .a-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--good);font-weight:600;display:block;margin-bottom:6px}
+.q-ans b{color:var(--txt)}
+
+/* code block */
+.code{margin:16px 0;border-radius:13px;overflow:hidden;border:1px solid var(--border)}
+.code-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg-2);padding:9px 14px;border-bottom:1px solid var(--border);
+}
+.code-file{
+  font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txt-dim);
+  display:flex;align-items:center;gap:8px;
+}
+.code-file .dot{width:9px;height:9px;border-radius:50%;background:var(--dev-vibrante)}
+.copy-btn{
+  background:var(--bg-card);border:1px solid var(--border);color:var(--txt-dim);
+  font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 11px;border-radius:7px;
+  cursor:pointer;transition:.15s;font-weight:500;
+}
+.copy-btn:hover{color:var(--txt);border-color:var(--accent)}
+.copy-btn.done{color:var(--good);border-color:var(--good)}
+pre{
+  background:var(--code-bg);padding:16px 18px;overflow-x:auto;
+  font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.65;
+}
+pre code{font-family:inherit;color:#d6cdec;white-space:pre}
+pre::-webkit-scrollbar{height:8px}
+pre::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+/* syntax */
+.tok-key{color:#c792ea}.tok-type{color:#82aaff}.tok-str{color:#c3e88d}
+.tok-num{color:#f78c6c}.tok-com{color:#5c6370;font-style:italic}
+.tok-fn{color:#82aaff}.tok-punc{color:#89ddff}.tok-out{color:#ffcb6b}
+
+/* tables */
+.t-wrap{margin:16px 0;border:1px solid var(--border);border-radius:13px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th,td{text-align:left;padding:11px 16px;border-bottom:1px solid var(--border-soft)}
+th{background:var(--bg-2);font-weight:600;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--txt-dim)}
+tr:last-child td{border-bottom:none}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent-bright);font-weight:500}
+td code{background:none!important;border:none!important;padding:0!important;color:var(--accent-bright)!important}
+
+/* steps infographic */
+.steps{display:flex;flex-direction:column;gap:0;margin:18px 0}
+.step{display:flex;gap:16px;position:relative;padding-bottom:22px}
+.step:not(:last-child)::before{content:"";position:absolute;left:17px;top:38px;bottom:0;width:2px;background:var(--border)}
+.step .s-num{
+  flex:none;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
+  font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;color:#fff;
+  background:linear-gradient(135deg,var(--dev-vibrante),var(--dev-principal));z-index:1;
+  box-shadow:0 4px 12px rgba(96,24,240,.35);
+}
+.step .s-body{padding-top:5px}
+.step .s-body h5{font-size:14.5px;font-weight:600;color:var(--txt);margin-bottom:3px}
+.step .s-body p{font-size:13.5px;color:var(--txt-dim)}
+.step .s-body code{font-size:.85em}
+
+/* git flow infographic (SVG-ish with CSS) */
+.gitflow{display:flex;align-items:stretch;gap:0;margin:22px 0;flex-wrap:wrap}
+.git-node{
+  flex:1;min-width:120px;background:var(--bg-card);border:1px solid var(--border);
+  border-radius:13px;padding:16px 14px;text-align:center;position:relative;
+}
+.git-node .gn-cmd{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:var(--accent-bright);margin-bottom:5px}
+.git-node .gn-desc{font-size:12px;color:var(--txt-dim)}
+.git-arrow{display:grid;place-items:center;color:var(--accent);font-size:20px;padding:0 6px;flex:none}
+@media(max-width:560px){.git-arrow{transform:rotate(90deg)}.git-node{flex:1 1 100%}}
+
+/* pills for operators */
+.op-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:11px;margin:16px 0}
+.op-pill{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;transition:.16s}
+.op-pill:hover{border-color:var(--accent);transform:translateY(-2px)}
+.op-pill .op-sym{font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:700;color:var(--accent-bright)}
+.op-pill .op-name{font-size:13px;color:var(--txt-dim);margin-top:4px}
+
+/* vaso analogy svg */
+.svg-fig{display:flex;justify-content:center;margin:22px 0}
+.svg-fig svg{max-width:100%;height:auto}
+.fig-cap{text-align:center;font-size:13px;color:var(--txt-faint);margin-top:-6px;font-style:italic}
+
+/* objectives chips */
+.obj-list{display:grid;gap:11px;margin:18px 0}
+.obj{display:flex;gap:13px;align-items:flex-start;background:var(--bg-card);border:1px solid var(--border);border-radius:13px;padding:15px 18px}
+.obj .o-ico{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(96,24,240,.16);font-size:17px}
+.obj h5{font-size:15px;font-weight:600;margin-bottom:2px}
+.obj p{font-size:13.5px;color:var(--txt-dim)}
+
+.section-foot{max-width:var(--maxw);margin:40px auto 0;padding:0 40px}
+.foot-nav{display:flex;justify-content:space-between;gap:14px;border-top:1px solid var(--border);padding-top:22px}
+.foot-btn{
+  display:flex;flex-direction:column;gap:2px;background:var(--bg-card);border:1px solid var(--border);
+  border-radius:12px;padding:12px 18px;cursor:pointer;color:var(--txt);font-family:inherit;
+  transition:.16s;min-width:140px;text-align:left;
+}
+.foot-btn:hover:not(:disabled){border-color:var(--accent);background:var(--bg-card-2)}
+.foot-btn:disabled{opacity:.3;cursor:default}
+.foot-btn.next{text-align:right;align-items:flex-end;margin-left:auto}
+.foot-btn .fb-dir{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--txt-faint);letter-spacing:.08em}
+.foot-btn .fb-title{font-size:13.5px;font-weight:600}
+
+.page-footer{
+  max-width:var(--maxw);margin:50px auto 0;padding:24px 40px 0;border-top:1px solid var(--border-soft);
+  text-align:center;font-size:12px;color:var(--txt-faint);line-height:1.7;
+}
+.page-footer a{color:var(--accent-bright);text-decoration:none}
+
+/* ============ PRESENT MODE ============ */
+body.present .sidebar{transform:translateX(-100%)}
+body.present .main{margin-left:0}
+body.present .topbar{display:none!important}
+body.present .section{
+  max-width:1100px;min-height:100vh;display:none;
+  padding:64px 64px;justify-content:center;flex-direction:column;
+}
+body.present .section.visible{display:flex}
+body.present .sec-title{font-size:46px}
+body.present .sec-lead{font-size:20px}
+body.present .section-foot,body.present .page-footer{display:none}
+body.present .foot-nav{display:none}
+.present-hud{
+  display:none;position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+  z-index:200;background:rgba(18,12,31,.92);backdrop-filter:blur(10px);
+  border:1px solid var(--border);border-radius:99px;padding:9px 18px;
+  align-items:center;gap:16px;font-size:12.5px;color:var(--txt-dim);
+  font-family:'JetBrains Mono',monospace;
+}
+body.present .present-hud{display:flex}
+.present-hud .ph-prog{color:var(--accent-bright);font-weight:600}
+.present-hud kbd{background:var(--bg-2);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:11px}
+.present-hud .ph-exit{background:none;border:none;color:var(--danger);cursor:pointer;font-family:inherit;font-size:12px}
+.present-dots{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:200;display:none;gap:7px}
+body.present .present-dots{display:flex}
+.present-dots span{width:8px;height:8px;border-radius:50%;background:var(--border);transition:.2s}
+.present-dots span.on{background:var(--accent-bright);width:22px;border-radius:99px}
+
+/* mobile */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90}
+@media(max-width:880px){
+  .sidebar{transform:translateX(-100%)}
+  body.nav-open .sidebar{transform:none}
+  body.nav-open .overlay{display:block}
+  .main{margin-left:0}
+  .topbar{display:flex}
+  .section{padding:30px 20px 0}
+  .section-foot{padding:0 20px}
+  .page-footer{padding:30px 20px 0}
+  .sec-title{font-size:27px}
+  .grid-2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="eyebrow">Dev Senior · Java AI Engineer</div>
+    <h1>Operadores, lógica y Git</h1>
+    <div class="sub">Clase 2 · Módulo 1 — Fundamentos modernos con Java</div>
+    <span class="badge">● Nivel principiante</span>
+  </div>
+  <nav class="nav" id="nav"></nav>
+  <div class="sidebar-foot">
+    <div class="progress-wrap"><span>Progreso</span><span id="progTxt">0 / 0</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+    <button class="present-btn" id="presentBtn">▶ Modo presentación</button>
+  </div>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<div class="main" id="main">
+  <div class="topbar">
+    <button class="hamburger" id="hamburger">☰</button>
+    <h2 id="topTitle">Clase 2</h2>
+    <button class="hamburger" id="presentBtnMobile">▶</button>
+  </div>
+  <div id="sections"></div>
+
+  <div class="page-footer">
+    © 2026 Ana Alvarado · Educadora Tech &amp; Desarrolladora Full Stack<br>
+    <a href="https://linkedin.com/in/ana-alvarado-instructora-full-stack" target="_blank" rel="noopener">linkedin.com/in/ana-alvarado-instructora-full-stack</a>
+  </div>
+</div>
+
+<!-- ============ PRESENT HUD ============ -->
+<div class="present-dots" id="dots"></div>
+<div class="present-hud">
+  <span>Sección <span class="ph-prog" id="hudNum">1</span></span>
+  <span><kbd>←</kbd> <kbd>→</kbd> navegar</span>
+  <span><kbd>Esc</kbd> salir</span>
+  <button class="ph-exit" id="exitPresent">✕ Salir</button>
+</div>
+
+<script>
+/* ===================== CONTENIDO ===================== */
+/* helper para escapar y resaltar código Java/Bash de forma simple */
+const SECTIONS = [
+  {
+    id:"intro", icon:"🎯", nav:"Bienvenida", num:"00",
+    eyebrow:"Punto de partida",
+    title:"Hoy los datos se ponen a trabajar",
+    emoji:"🎯",
+    lead:"La clase pasada aprendimos a guardar datos en variables y mostrarlos. Hoy haremos que esos datos calculen, se comparen y tomen decisiones — y subiremos todo a GitHub, paso a paso.",
+    html:`
+      <div class="obj-list">
+        <div class="obj"><div class="o-ico">🧮</div><div><h5>Operar con datos</h5><p>Sumar, restar, dividir y comparar valores con operadores.</p></div></div>
+        <div class="obj"><div class="o-ico">🔀</div><div><h5>Tomar decisiones</h5><p>Combinar condiciones con lógica para que el programa elija.</p></div></div>
+        <div class="obj"><div class="o-ico">⌨️</div><div><h5>Leer al usuario</h5><p>Pedir datos reales por teclado con <code>Scanner</code>.</p></div></div>
+        <div class="obj"><div class="o-ico">🐙</div><div><h5>Versionar en GitHub</h5><p>Construir un repositorio con varios programas: tu primer portafolio.</p></div></div>
+      </div>
+      <div class="banner tip"><span class="b-ico">💡</span><div class="b-body"><b>Una idea clave:</b> guardar un dato no es lo mismo que operar con él. Si escribes <code>int edad = 20;</code>, el programa solo lo guarda. Hoy desbloqueamos lo que sigue: ponerlo a trabajar.</div></div>
+      <p class="body">Repasaremos primero lo esencial de la clase anterior y, sobre esa base, construiremos un mismo ejemplo que crece toda la sesión: una <strong>calculadora de propinas y cuentas de restaurante</strong>.</p>
+    `
+  },
+
+  {
+    id:"git", icon:"🐙", nav:"Git y GitHub", num:"01",
+    eyebrow:"Control de versiones",
+    title:"Git y GitHub desde cero",
+    emoji:"🐙",
+    lead:"Antes de programar más, montamos el lugar donde vivirá tu código y su historia. Git lleva el registro en tu computador; GitHub lo guarda en internet.",
+    html:`
+      <div class="grid-2">
+        <div class="def-card tech"><span class="tag">Técnico</span><h4>Git</h4><p>Sistema de control de versiones distribuido (creado en 2005). Vive en tu computador y guarda la historia de cada cambio en tu código.</p></div>
+        <div class="def-card real"><span class="tag">En la vida real</span><h4>GitHub</h4><p>La página web donde subes esa historia para guardarla en la nube y compartirla. <b>Git ≠ GitHub:</b> uno es la herramienta local, el otro es la nube.</p></div>
+      </div>
+
+      <div class="banner data"><span class="b-ico">📚</span><div class="b-body">El nombre de archivos como <b>tarea_final</b>, <b>tarea_final_2</b>, <b>tarea_final_ESTA_SÍ</b> es control de versiones hecho a mano… y mal. Git lo hace bien y automático.</div></div>
+
+      ${q("¿Cuál es la diferencia entre Git y GitHub?",
+         "<b>Git</b> es la herramienta de control de versiones que corre localmente en tu computador y registra el historial de cambios. <b>GitHub</b> es la plataforma web que aloja repositorios Git en internet para guardarlos y compartirlos. Trabajan juntos, pero no son lo mismo.")}
+
+      <div class="h3">Verificar que Git esté instalado</div>
+      <p class="body">En la terminal de VS Code (la abres con <code>Ctrl + ñ</code> o <code>View &gt; Terminal</code>):</p>
+      ${code("bash","Terminal",
+`git --version`)}
+      <p class="body">Si responde algo como <code>git version 2.x.x</code>, ya está instalado. Si dice <em>"command not found"</em>, hay que instalarlo desde <code>git-scm.com/downloads</code>.</p>
+      <div class="banner warn"><span class="b-ico">⚠️</span><div class="b-body"><b>En Windows:</b> tras instalar Git, cierra y vuelve a abrir VS Code (o la terminal) para que reconozca el comando. Si no, parecerá que "no se instaló".</div></div>
+
+      <div class="h3">Configurar tu identidad (una sola vez)</div>
+      <p class="body">Git necesita saber quién hace cada cambio. Esto se configura una vez por computador. Usa el <strong>mismo correo</strong> con el que crearás tu cuenta de GitHub, para que tus commits queden conectados a tu perfil.</p>
+      ${code("bash","Terminal",
+`git config --global user.name "Tu Nombre"
+git config --global user.email "tu-correo@ejemplo.com"`)}
+
+      <div class="h3">Crear cuenta y repositorio</div>
+      <div class="steps">
+        <div class="step"><div class="s-num">1</div><div class="s-body"><h5>Crea tu cuenta en github.com</h5><p>Usa un usuario que sea parte de tu marca profesional: <code>nombreapellido</code> o <code>nombredev</code> se ve serio ante un reclutador.</p></div></div>
+        <div class="step"><div class="s-num">2</div><div class="s-body"><h5>Nuevo repositorio</h5><p>Botón <b>+</b> arriba a la derecha → <b>New repository</b>. Nómbralo <code>java-ai-engineer-clase02</code>.</p></div></div>
+        <div class="step"><div class="s-num">3</div><div class="s-body"><h5>Configúralo público</h5><p>Marca <b>Public</b> (es tu portafolio) y activa <b>Add a README file</b>.</p></div></div>
+        <div class="step"><div class="s-num">4</div><div class="s-body"><h5>Clónalo a tu computador</h5><p>Clonar = traer una copia del repo de internet a tu PC.</p></div></div>
+      </div>
+      ${code("bash","Terminal",
+`cd Documentos
+git clone https://github.com/TU-USUARIO/java-ai-engineer-clase02.git
+cd java-ai-engineer-clase02
+code .`)}
+
+      <div class="h3">El ciclo que vas a memorizar: add → commit → push</div>
+      <div class="gitflow">
+        <div class="git-node"><div class="gn-cmd">git add</div><div class="gn-desc">Prepara los archivos para guardarlos (staging)</div></div>
+        <div class="git-arrow">→</div>
+        <div class="git-node"><div class="gn-cmd">git commit</div><div class="gn-desc">Toma una "foto" del estado con una etiqueta</div></div>
+        <div class="git-arrow">→</div>
+        <div class="git-node"><div class="gn-cmd">git push</div><div class="gn-desc">Sube esa foto a GitHub</div></div>
+      </div>
+      <p class="body">Creamos un archivo <code>Bienvenida.java</code> y subimos tu primer ciclo completo, incluyendo varios archivos a la vez:</p>
+      ${code("java","Bienvenida.java",
+`public class Bienvenida {
+    public static void main(String[] args) {
+        System.out.println("Mi primer programa versionado con Git");
+    }
+}`)}
+      ${code("bash","Terminal",
+`git status
+git add Bienvenida.java RepasoClase1.java
+git commit -m "Agrega programa de bienvenida y repaso de la clase 1"
+git push`)}
+
+      ${q("¿Qué hace cada uno de estos comandos?",
+        "<b>git status</b> muestra qué archivos cambiaron y cuáles están listos para guardar. <b>git add</b> mueve esos cambios al área de staging (los prepara). <b>git commit -m</b> registra una versión en el historial local con un mensaje que describe qué hiciste. <b>git push</b> envía esos commits al repositorio remoto en GitHub.")}
+
+      <div class="banner warn"><span class="b-ico">⚠️</span><div class="b-body">
+        <b>Cosas que suelen pasar:</b> si <code>git add</code> no encuentra el archivo, revisa que la terminal esté en la misma carpeta del archivo. Si al hacer push te piden usuario y contraseña y la contraseña no funciona, es porque GitHub ya no acepta la contraseña normal: usa un <em>token</em> o el login del navegador. Y en el mensaje del commit, describe <b>qué</b> hiciste — nunca "cambios" ni "asdf".
+      </div></div>
+    `
+  },
+
+  {
+    id:"constantes", icon:"🔒", nav:"Constantes (final)", num:"02",
+    eyebrow:"Valores que no cambian",
+    title:"Constantes con final",
+    emoji:"🔒",
+    lead:"Algunos valores no deberían cambiar nunca durante el programa. Para eso existen las constantes: se declaran una vez, se nombran, y quedan protegidas.",
+    html:`
+      ${q("Si el IVA (19%) está escrito a mano como 0.19 en 30 lugares de tu programa y mañana cambia la ley, ¿qué problema tienes?",
+        "Tendrías que buscar y cambiar el valor en los 30 lugares, y seguramente olvidarías alguno — eso introduce un bug. La solución es declarar el valor una sola vez como constante: si cambia, lo modificas en un único punto.")}
+
+      <div class="grid-2">
+        <div class="def-card tech"><span class="tag">Técnico</span><h4>Constante con <code>final</code></h4><p>Una variable declarada <code>final</code> solo puede asignarse una vez. Cualquier intento posterior de reasignarla es un error de compilación.</p></div>
+        <div class="def-card real"><span class="tag">En la vida real</span><h4>El IVA de Colombia</h4><p>El 19% se usa en muchos cálculos. Lo declaras una vez como <code>final double IVA = 0.19;</code> y todo el programa lo usa desde ahí.</p></div>
+      </div>
+
+      <p class="body">Antes del código, lo que hace: declaramos dos constantes y las mostramos. El valor queda fijo y protegido.</p>
+      ${code("java","Constantes.java",
+`public class Constantes {
+    public static void main(String[] args) {
+        final double IVA = 0.19;
+        final int DIAS_SEMANA = 7;
+
+        System.out.println("El IVA es: " + IVA);
+        System.out.println("Días en una semana: " + DIAS_SEMANA);
+    }
+}`)}
+
+      ${q("Si después de declarar una constante intentas reasignarla (por ejemplo IVA = 0.16), ¿compila el programa?",
+        "No compila. Java lo impide con el error que indica que no se puede asignar un valor a una variable <code>final</code>. Esto es deseable: <code>final</code> protege el valor y previene errores, porque el programa se niega a dejarte cambiarlo por accidente.")}
+
+      <div class="banner tip"><span class="b-ico">💡</span><div class="b-body"><b>Convención profesional:</b> las constantes se escriben en <code>MAYÚSCULAS_CON_GUION_BAJO</code> (<code>IVA</code>, <code>DIAS_SEMANA</code>, <code>PRECIO_BASE</code>). Las variables normales van en <code>camelCase</code> (<code>precioTotal</code>, <code>nombreCliente</code>).</div></div>
+
+      <div class="banner data"><span class="b-ico">📚</span><div class="b-body"><b>Dato:</b> Java tiene 8 tipos primitivos: <code>byte</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>float</code>, <code>double</code>, <code>boolean</code>, <code>char</code>. <code>String</code> no es primitivo — es una clase (<code>java.lang.String</code>).</div></div>
+    `
+  },
+
+  {
+    id:"aritmeticos", icon:"🧮", nav:"Operadores aritméticos", num:"03",
+    eyebrow:"Hacer cálculos",
+    title:"Operadores aritméticos",
+    emoji:"🧮",
+    lead:"Los operadores de toda la vida… más uno que sorprende. Aquí empieza nuestro ejemplo que crece toda la clase: la calculadora del restaurante.",
+    html:`
+      <div class="op-grid">
+        <div class="op-pill"><div class="op-sym">+</div><div class="op-name">suma</div></div>
+        <div class="op-pill"><div class="op-sym">−</div><div class="op-name">resta</div></div>
+        <div class="op-pill"><div class="op-sym">*</div><div class="op-name">multiplicación</div></div>
+        <div class="op-pill"><div class="op-sym">/</div><div class="op-name">división</div></div>
+        <div class="op-pill"><div class="op-sym">%</div><div class="op-name">módulo (residuo)</div></div>
+      </div>
+
+      <p class="body">Antes del código: calculamos una propina del 10% sobre la cuenta y la sumamos al total. Esta es la base que haremos crecer.</p>
+      ${code("java","Restaurante.java",
+`public class Restaurante {
+    public static void main(String[] args) {
+        double cuenta = 80000;
+        double propina = cuenta * 0.10;
+        double total = cuenta + propina;
+
+        System.out.println("Cuenta:  " + cuenta);
+        System.out.println("Propina: " + propina);
+        System.out.println("Total:   " + total);
+    }
+}`)}
+
+      <div class="h3">El truco de la división entera</div>
+      ${q("¿Cuánto da 7 / 2 en Java, si ambos son enteros?",
+        "Da <b>3</b>, no 3.5. Cuando divides dos enteros, el resultado es entero: Java <b>descarta</b> los decimales (los corta, no redondea). Para obtener 3.5, al menos uno de los dos números debe ser decimal (<code>double</code>).")}
+
+      <p class="body">Antes del código: mostramos cómo forzar el resultado decimal — basta con que uno de los operandos sea <code>double</code>.</p>
+      ${code("java","Restaurante.java",
+`int a = 7;
+int b = 2;
+System.out.println(a / b);        // 3   (división entera: corta decimales)
+
+double c = 7.0 / 2;               // 3.5 (uno es decimal)
+System.out.println(c);
+System.out.println(7.0 / 2);      // 3.5
+System.out.println((double) 7 / 2); // 3.5`)}
+
+      <div class="banner data"><span class="b-ico">📚</span><div class="b-body"><b>Dato:</b> la división <code>/</code> entre dos enteros realiza <b>división entera</b> (trunca hacia cero). Si al menos un operando es de punto flotante, la división es decimal.</div></div>
+
+      <div class="h3">El módulo % : el residuo, y para qué sirve</div>
+      ${code("java","Restaurante.java",
+`System.out.println(10 % 3); // 1
+System.out.println(10 % 2); // 0
+System.out.println(9 % 2);  // 1`)}
+      ${q("Si numero % 2 da 0, ¿qué sabes del número?",
+        "Que es <b>par</b>. El módulo es la forma profesional de saber si un número es par, impar o múltiplo de algo: si el residuo de dividir entre 2 es 0, no sobró nada, así que es divisible por 2.")}
+
+      <div class="h3">Incremento y decremento</div>
+      ${code("java","Restaurante.java",
+`int contador = 5;
+contador++;  // ahora vale 6
+contador--;  // vuelve a 5
+System.out.println(contador);`)}
+      <p class="body"><code>++</code> suma uno y <code>--</code> resta uno. Los verás muchísimo cuando lleguemos a los ciclos.</p>
+    `
+  },
+
+  {
+    id:"casting", icon:"🔄", nav:"Conversión de tipos", num:"04",
+    eyebrow:"Cambiar de tipo",
+    title:"Conversión de tipos (casting)",
+    emoji:"🔄",
+    lead:"Convertir tipos es como pasar agua entre vasos de distinto tamaño. De un vaso chico a uno grande no se derrama nada; al revés, sí — y por eso Java te pide permiso.",
+    html:`
+      <div class="svg-fig">
+        <svg viewBox="0 0 460 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Analogía de vasos para la conversión de tipos">
+          <defs>
+            <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#8B5CF6"/><stop offset="1" stop-color="#6018F0"/>
+            </linearGradient>
+          </defs>
+          <!-- vaso chico int -->
+          <path d="M40 70 L70 70 L66 150 L44 150 Z" fill="none" stroke="#2c2140" stroke-width="2"/>
+          <path d="M44 110 L66 110 L66 150 L44 150 Z" fill="url(#water)" opacity="0.9"/>
+          <text x="55" y="180" fill="#A99FC0" font-size="13" text-anchor="middle" font-family="JetBrains Mono">int</text>
+          <text x="55" y="58" fill="#7a6f93" font-size="11" text-anchor="middle">chico</text>
+          <!-- flecha implícita -->
+          <path d="M85 110 L175 110" stroke="#34d399" stroke-width="2" marker-end="url(#a1)"/>
+          <marker id="a1" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6" fill="#34d399"/></marker>
+          <text x="130" y="100" fill="#34d399" font-size="11" text-anchor="middle">automática, segura</text>
+          <!-- vaso grande double -->
+          <path d="M195 55 L240 55 L232 160 L203 160 Z" fill="none" stroke="#2c2140" stroke-width="2"/>
+          <path d="M205 120 L230 120 L232 160 L203 160 Z" fill="url(#water)" opacity="0.9"/>
+          <text x="217" y="185" fill="#A99FC0" font-size="13" text-anchor="middle" font-family="JetBrains Mono">double</text>
+          <text x="217" y="44" fill="#7a6f93" font-size="11" text-anchor="middle">grande</text>
+          <!-- flecha explícita -->
+          <path d="M255 110 L345 110" stroke="#fb7185" stroke-width="2" marker-end="url(#a2)"/>
+          <marker id="a2" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6" fill="#fb7185"/></marker>
+          <text x="300" y="100" fill="#fb7185" font-size="11" text-anchor="middle">manual: se pierde</text>
+          <text x="300" y="128" fill="#fb7185" font-size="10" text-anchor="middle">(int)</text>
+          <!-- gotas derramadas -->
+          <circle cx="315" cy="138" r="2.5" fill="#fb7185"/><circle cx="322" cy="146" r="2" fill="#fb7185"/>
+          <!-- vaso chico destino -->
+          <path d="M375 70 L405 70 L401 150 L379 150 Z" fill="none" stroke="#2c2140" stroke-width="2"/>
+          <path d="M379 120 L401 120 L401 150 L379 150 Z" fill="url(#water)" opacity="0.9"/>
+          <text x="390" y="180" fill="#A99FC0" font-size="13" text-anchor="middle" font-family="JetBrains Mono">int</text>
+        </svg>
+      </div>
+      <div class="fig-cap">Chico → grande: automático. Grande → chico: hay que forzarlo y se pierden decimales.</div>
+
+      ${q("Al pasar un int a double, ¿se pierde información? ¿Y al pasar un double a int?",
+        "De <b>int a double</b> (chico a grande) no se pierde nada: Java lo hace automáticamente (conversión implícita o <em>widening</em>). De <b>double a int</b> (grande a chico) sí se pierden los decimales, así que Java te obliga a forzarlo con un cast explícito y te advierte del riesgo (conversión explícita o <em>narrowing</em>).")}
+
+      <p class="body">Antes del código: mostramos las dos direcciones. La implícita ocurre sola; la explícita necesita el <code>(int)</code> delante.</p>
+      ${code("java","Conversiones.java",
+`public class Conversiones {
+    public static void main(String[] args) {
+        int enteros = 5;
+        double aDecimal = enteros;   // implícita: se convierte solo
+        System.out.println(aDecimal); // 5.0
+
+        double precio = 9.99;
+        int precioRedondeado = (int) precio;  // explícita: el (int) es el casting
+        System.out.println(precioRedondeado); // 9  (corta, NO redondea)
+    }
+}`)}
+
+      ${q("¿(int) 9.99 da 10 o 9?",
+        "Da <b>9</b>. El casting <b>corta</b> los decimales, igual que la división entera — no redondea. Si quisieras redondear de verdad, usarías <code>Math.round()</code>, que veremos más adelante.")}
+
+      <div class="banner warn"><span class="b-ico">⚠️</span><div class="b-body">Si escribes <code>int x = precio;</code> sin el <code>(int)</code>, Java no compila: avisa que la conversión puede perder información. Ponerle <code>(int)</code> es tu forma de decirle "sí, lo sé, hazlo".</div></div>
+    `
+  },
+
+  {
+    id:"relacionales", icon:"⚖️", nav:"Operadores relacionales", num:"05",
+    eyebrow:"Comparar valores",
+    title:"Operadores relacionales",
+    emoji:"⚖️",
+    lead:"Hasta ahora calculábamos. Ahora comparamos. Y comparar siempre da una de dos respuestas: verdadero o falso — es decir, un boolean.",
+    html:`
+      <div class="t-wrap"><table>
+        <thead><tr><th>Operador</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td>==</td><td>¿es igual a?</td></tr>
+          <tr><td>!=</td><td>¿es distinto de?</td></tr>
+          <tr><td>&gt;</td><td>¿mayor que?</td></tr>
+          <tr><td>&lt;</td><td>¿menor que?</td></tr>
+          <tr><td>&gt;=</td><td>¿mayor o igual?</td></tr>
+          <tr><td>&lt;=</td><td>¿menor o igual?</td></tr>
+        </tbody>
+      </table></div>
+
+      <p class="body">Antes del código: comparamos una edad contra 18 y guardamos el resultado de la comparación en una variable <code>boolean</code>.</p>
+      ${code("java","Comparaciones.java",
+`public class Comparaciones {
+    public static void main(String[] args) {
+        int edad = 20;
+
+        System.out.println(edad >= 18); // true
+        System.out.println(edad == 18); // false
+        System.out.println(edad != 18); // true
+
+        boolean esMayorDeEdad = edad >= 18;
+        System.out.println("¿Es mayor de edad? " + esMayorDeEdad);
+    }
+}`)}
+      <p class="body">El resultado de una comparación se puede <strong>guardar en una variable</strong> <code>boolean</code>. Esto será clave para los condicionales de la próxima clase.</p>
+
+      <div class="h3">El error más famoso: = vs ==</div>
+      ${q("¿Cuál es la diferencia entre = y == ?",
+        "<b>=</b> (uno solo) <b>asigna</b>: \"guarda esto aquí\". <b>==</b> (doble) <b>compara</b>: \"¿son iguales?\". Para comparar siempre se usa <code>==</code>. En Java, escribir <code>if (edad = 18)</code> ni siquiera compila, porque <code>if</code> espera un <code>boolean</code> y una asignación da un número — Java te protege de ese error clásico.")}
+
+      <div class="banner warn"><span class="b-ico">⚠️</span><div class="b-body"><b>Ojo con los textos:</b> <code>==</code> no se usa para comparar dos <code>String</code> de la forma intuitiva — para texto se usa <code>.equals()</code>. Lo veremos bien más adelante; por ahora, <code>==</code> lo usamos con números y booleanos.</div></div>
+    `
+  },
+
+  {
+    id:"logicos", icon:"🔗", nav:"Operadores lógicos", num:"06",
+    eyebrow:"Combinar condiciones",
+    title:"Operadores lógicos",
+    emoji:"🔗",
+    lead:"A veces una sola comparación no basta: \"para entrar tienes que ser mayor de edad Y tener cédula\". Eso es lógica: combinar varias condiciones en una sola respuesta.",
+    html:`
+      <div class="t-wrap"><table>
+        <thead><tr><th>Operador</th><th>Nombre</th><th>Da true cuando…</th></tr></thead>
+        <tbody>
+          <tr><td>&amp;&amp;</td><td>Y (AND)</td><td>ambas condiciones son verdaderas</td></tr>
+          <tr><td>||</td><td>O (OR)</td><td>al menos una es verdadera</td></tr>
+          <tr><td>!</td><td>NO (NOT)</td><td>invierte: true→false, false→true</td></tr>
+        </tbody>
+      </table></div>
+
+      <p class="body">Antes del código: combinamos condiciones con AND, OR y NOT sobre datos de un cliente.</p>
+      ${code("java","Logica.java",
+`public class Logica {
+    public static void main(String[] args) {
+        int edad = 20;
+        boolean tieneCedula = true;
+
+        System.out.println(edad >= 18 && tieneCedula); // true (las dos se cumplen)
+
+        boolean esFinDeSemana = false;
+        boolean esFestivo = true;
+        System.out.println(esFinDeSemana || esFestivo); // true (con una basta)
+
+        System.out.println(!tieneCedula); // false (invierte)
+    }
+}`)}
+
+      ${q("¿Cuánto dan: true && false, true || false, y !false ?",
+        "<b>true &amp;&amp; false → false</b> (el AND exige que las dos sean verdaderas). <b>true || false → true</b> (al OR le basta con una). <b>!false → true</b> (el NOT invierte el valor).")}
+
+      <div class="h3">Dato profesional: el cortocircuito</div>
+      <p class="body"><code>&amp;&amp;</code> y <code>||</code> evalúan <strong>de izquierda a derecha y se detienen apenas saben la respuesta</strong>. En <code>A && B</code>, si <code>A</code> ya es <code>false</code>, Java ni mira <code>B</code>. En <code>A || B</code>, si <code>A</code> ya es <code>true</code>, ni mira <code>B</code>.</p>
+      <div class="banner data"><span class="b-ico">📚</span><div class="b-body"><b>Dato:</b> <code>&amp;&amp;</code> y <code>||</code> son operadores de <b>evaluación en cortocircuito</b>: el operando derecho solo se evalúa si el izquierdo no determina ya el resultado.</div></div>
+      <div class="banner tip"><span class="b-ico">💡</span><div class="b-body"><b>¿Por qué importa?</b> Evita errores y mejora el rendimiento. Lo agradecerás al validar datos: "si el dato existe <b>Y</b> es válido" — primero verificas que exista, y solo entonces miras si es válido.</div></div>
+    `
+  },
+
+  {
+    id:"scanner", icon:"⌨️", nav:"Scanner: entrada real", num:"07",
+    eyebrow:"Programa interactivo",
+    title:"Scanner: leer datos del usuario",
+    emoji:"⌨️",
+    lead:"Hasta ahora poníamos los datos a mano. Un programa de verdad le pregunta al usuario. Para leer desde la consola usamos Scanner.",
+    html:`
+      <p class="body">Antes del código: importamos <code>Scanner</code>, lo creamos, pedimos la cuenta y el número de personas, y dividimos el total. Estas son las cinco partes de todo programa con <code>Scanner</code>.</p>
+      ${code("java","RestauranteInteractivo.java",
+`import java.util.Scanner;   // 1. importar, va arriba del todo
+
+public class RestauranteInteractivo {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);  // 2. crear el lector
+
+        System.out.print("¿Cuánto fue la cuenta? ");
+        double cuenta = sc.nextDouble();       // 3. leer un decimal
+
+        System.out.print("¿Cuántas personas? ");
+        int personas = sc.nextInt();           // 4. leer un entero
+
+        double propina = cuenta * 0.10;
+        double total = cuenta + propina;
+        double porPersona = total / personas;
+
+        System.out.println("Total con propina: " + total);
+        System.out.println("Cada persona paga: " + porPersona);
+
+        sc.close();   // 5. cerrar el lector
+    }
+}`)}
+      <div class="steps">
+        <div class="step"><div class="s-num">1</div><div class="s-body"><h5>Importar</h5><p><code>import java.util.Scanner;</code> trae la herramienta. Va arriba, antes de <code>public class</code>.</p></div></div>
+        <div class="step"><div class="s-num">2</div><div class="s-body"><h5>Crear el lector</h5><p><code>new Scanner(System.in)</code> lo conecta al teclado.</p></div></div>
+        <div class="step"><div class="s-num">3</div><div class="s-body"><h5>Leer decimal</h5><p><code>nextDouble()</code> lee un número con decimales.</p></div></div>
+        <div class="step"><div class="s-num">4</div><div class="s-body"><h5>Leer entero</h5><p><code>nextInt()</code> lee un número entero.</p></div></div>
+        <div class="step"><div class="s-num">5</div><div class="s-body"><h5>Cerrar</h5><p><code>sc.close()</code> cierra el lector al terminar.</p></div></div>
+      </div>
+
+      <div class="banner warn"><span class="b-ico">⚠️</span><div class="b-body"><b>Punto o coma en los decimales:</b> según la configuración regional del computador, <code>nextDouble()</code> puede esperar la coma (<code>80,5</code>) en vez del punto (<code>80.5</code>). Si te da error al escribir un decimal, prueba con coma.</div></div>
+
+      <div class="h3">El bug clásico del Scanner (el momento de oro)</div>
+      ${q("Si lees un número con nextInt() y luego un texto con nextLine(), el programa \"se salta\" el texto y no te deja escribirlo. ¿Por qué?",
+        "Cuando escribes un número y presionas <b>Enter</b>, el teclado envía el número <b>y</b> un salto de línea invisible (<code>\\n</code>). <code>nextInt()</code> toma el número pero <b>deja el salto de línea ahí tirado</b>. Cuando llega <code>nextLine()</code>, encuentra ese salto sobrante, lo toma como si fuera tu respuesta (vacía) y sigue de largo. No es un error tuyo: es un comportamiento conocido del <code>Scanner</code>.")}
+
+      <p class="body">Antes del código: la solución es de una línea — un <code>sc.nextLine()</code> extra que "se come" el salto de línea sobrante antes de leer el texto.</p>
+      ${code("java","RestauranteInteractivo.java",
+`int personas = sc.nextInt();
+sc.nextLine();   // ← consume el salto de línea pendiente
+
+System.out.print("Nombre de quien paga: ");
+String nombre = sc.nextLine();   // ahora SÍ espera tu respuesta
+System.out.println("Gracias, " + nombre);`)}
+
+      <div class="banner data"><span class="b-ico">📚</span><div class="b-body"><b>Regla mental:</b> después de leer un número con <code>nextInt()</code> / <code>nextDouble()</code>, si lo siguiente es un <code>nextLine()</code>, pon un <code>sc.nextLine()</code> de limpieza en medio. Es un comportamiento documentado del <code>Scanner</code> en el rastreador oficial de Java (JDK-8350190).</div></div>
+    `
+  },
+
+  {
+    id:"integrador", icon:"🤖", nav:"Ejercicio integrador", num:"08",
+    eyebrow:"Junta todo · con Cursor AI",
+    title:"Validador de cuenta de restaurante",
+    emoji:"🤖",
+    lead:"Juntamos todo lo de hoy en un solo programa, construido con ayuda de Cursor AI como copiloto. La regla: la IA te ayuda a escribir, pero tú entiendes cada línea.",
+    html:`
+      <div class="card">
+        <div class="h3" style="margin-top:0">El reto</div>
+        <div class="steps">
+          <div class="step"><div class="s-num">1</div><div class="s-body"><h5>Pedir datos</h5><p>Cuenta (decimal), número de personas (entero) y si es cliente frecuente (<code>nextBoolean()</code>).</p></div></div>
+          <div class="step"><div class="s-num">2</div><div class="s-body"><h5>Calcular</h5><p>Propina (10%) y total.</p></div></div>
+          <div class="step"><div class="s-num">3</div><div class="s-body"><h5>Aplicar lógica</h5><p>Si es cliente frecuente <b>Y</b> la cuenta supera 100.000 → 5% de descuento sobre el total.</p></div></div>
+          <div class="step"><div class="s-num">4</div><div class="s-body"><h5>Repartir</h5><p>Dividir el total final entre las personas y mostrar todo con mensajes claros.</p></div></div>
+        </div>
+      </div>
+
+      <div class="banner tip"><span class="b-ico">💡</span><div class="b-body"><b>Cómo usar Cursor AI bien:</b> nota la diferencia entre "hazme el ejercicio" y un prompt donde tú dices <b>qué sabes</b> y <b>qué límites pones</b> ("ya sé Scanner, operadores y casting; no uses temas que no he visto como ciclos o métodos; deja comentarios explicando cada bloque"). El segundo te hace mejor desarrolladora; el primero te hace dependiente. Revisa siempre lo que propone, línea por línea — la IA es brillante y también se equivoca.</div></div>
+
+      <p class="body">Antes del código: el programa pide los datos, calcula propina y total, aplica el descuento solo si se cumplen las dos condiciones, y reparte entre las personas.</p>
+      ${code("java","ValidadorRestaurante.java",
+`import java.util.Scanner;
+
+public class ValidadorRestaurante {
+    public static void main(String[] args) {
+        final double PORCENTAJE_PROPINA = 0.10;
+        final double DESCUENTO_FRECUENTE = 0.05;
+        final double TOPE_DESCUENTO = 100000;
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Valor de la cuenta: ");
+        double cuenta = sc.nextDouble();
+
+        System.out.print("Numero de personas: ");
+        int personas = sc.nextInt();
+
+        System.out.print("¿Cliente frecuente? (true/false): ");
+        boolean frecuente = sc.nextBoolean();
+
+        double propina = cuenta * PORCENTAJE_PROPINA;
+        double total = cuenta + propina;
+
+        if (frecuente && cuenta > TOPE_DESCUENTO) {
+            total = total - (total * DESCUENTO_FRECUENTE);
+        }
+
+        double porPersona = total / personas;
+
+        System.out.println("Propina: " + propina);
+        System.out.println("Total final: " + total);
+        System.out.println("Cada persona paga: " + porPersona);
+
+        sc.close();
+    }
+}`)}
+      <p class="body">Ese <code>if</code> es una probadita de lo que viene: condicionales. No te preocupes por su sintaxis todavía — la lógica <code>frecuente && cuenta > TOPE</code> ya la entiendes de los bloques de comparación y lógica.</p>
+    `
+  },
+
+  {
+    id:"cierre", icon:"🚀", nav:"Cierre y tarea", num:"09",
+    eyebrow:"Lo que lograste · lo que viene",
+    title:"Cierre y puente a la próxima clase",
+    emoji:"🚀",
+    lead:"Hoy tu código pasó de guardar datos a calcular, comparar y decidir — y quedó versionado en GitHub.",
+    html:`
+      <div class="obj-list">
+        <div class="obj"><div class="o-ico">🧮</div><div><h5>Tu código calcula, compara y decide</h5><p>Operadores aritméticos, relacionales y lógicos en acción.</p></div></div>
+        <div class="obj"><div class="o-ico">🐙</div><div><h5>Tienes un repositorio en GitHub</h5><p>Con varios commits — eso es historia profesional, es portafolio.</p></div></div>
+        <div class="obj"><div class="o-ico">🤖</div><div><h5>Usaste Cursor AI como copiloto</h5><p>Entendiendo cada línea, no copiando.</p></div></div>
+      </div>
+
+      <div class="q">
+        <div class="q-head"><div class="q-mark">?</div><div class="q-text">Para pensar antes de la próxima clase</div></div>
+        <div style="margin:0 20px 18px 62px;color:var(--txt-dim);font-size:15px">
+          Usamos un <code>if</code> una sola vez, con una sola condición. ¿Qué pasaría si quisiéramos varios <strong>caminos distintos</strong>? Por ejemplo: 5% de descuento si gasta más de 100 mil, 10% si gasta más de 200 mil, y nada si gasta menos. ¿Cómo le enseñamos al programa a elegir entre varios caminos — y a <strong>repetir</strong> tareas sin escribirlas 100 veces?
+        </div>
+      </div>
+      <div class="banner tip"><span class="b-ico">➡️</span><div class="b-body">Eso es justo lo que veremos en la <b>Clase 3</b>: condicionales (<code>if / else if / switch</code>) y ciclos (<code>for / while</code>). Hoy el programa decidió una vez; la próxima, decidirá y repetirá como un profesional.</div></div>
+
+      <div class="h3">Tarea sugerida (opcional)</div>
+      <div class="card">
+        <p class="body" style="margin-bottom:0">Agrega al <code>ValidadorRestaurante</code> un mensaje que indique si el total por persona supera los 50 mil ("cuenta alta"), usando lo que viste hoy. Luego haz <code>push</code>. Así practicas el flujo <code>add → commit → push</code> por tu cuenta.</p>
+      </div>
+
+      <div class="h3">Chuleta: comandos Git de la clase</div>
+      <div class="t-wrap"><table>
+        <thead><tr><th>Comando</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td>git --version</td><td>verifica que Git esté instalado</td></tr>
+          <tr><td>git config --global user.name "…"</td><td>configura tu nombre (una vez)</td></tr>
+          <tr><td>git config --global user.email "…"</td><td>configura tu correo (una vez)</td></tr>
+          <tr><td>git clone &lt;url&gt;</td><td>trae un repo de GitHub a tu PC</td></tr>
+          <tr><td>git status</td><td>muestra qué cambió</td></tr>
+          <tr><td>git add &lt;archivo&gt;</td><td>prepara un archivo para guardar</td></tr>
+          <tr><td>git add .</td><td>prepara todos los cambios</td></tr>
+          <tr><td>git commit -m "mensaje"</td><td>guarda una versión con etiqueta</td></tr>
+          <tr><td>git push</td><td>sube los commits a GitHub</td></tr>
+          <tr><td>git log --oneline</td><td>muestra el historial de commits</td></tr>
+        </tbody>
+      </table></div>
+    `
+  }
+];
+
+/* ===================== helpers de render ===================== */
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function highlight(codeRaw, lang){
+  return codeRaw.split("\n").map(line=>hlLine(line,lang)).join("\n");
+}
+function hlLine(raw, lang){
+  // 1) separar comentario del resto (sin romper strings simples — suficiente para estos ejemplos)
+  let comment="";
+  const ci = lang==="bash" ? raw.indexOf("#") : raw.indexOf("//");
+  let codePart = raw;
+  if(ci>=0){ codePart = raw.slice(0,ci); comment = raw.slice(ci); }
+  // 2) proteger strings con tokens temporales
+  const stash=[];
+  let s = esc(codePart);
+  s = s.replace(/&quot;[^&]*?&quot;/g, m=>{stash.push('<span class="tok-str">'+m+'</span>');return "\u0000"+(stash.length-1)+"\u0000";});
+  s = s.replace(/'[^']*?'/g, m=>{stash.push('<span class="tok-str">'+m+'</span>');return "\u0000"+(stash.length-1)+"\u0000";});
+  // 3) resaltar tokens sobre el código sin strings
+  if(lang==="java"){
+    s = s.replace(/\b(public|class|static|void|final|import|new|if|else|return|true|false)\b/g,'<span class="tok-key">$1</span>');
+    s = s.replace(/\b(int|double|boolean|char|String|Scanner|System)\b/g,'<span class="tok-type">$1</span>');
+    s = s.replace(/\b(\d+\.?\d*)\b/g,'<span class="tok-num">$1</span>');
+    s = s.replace(/(println|print|nextDouble|nextInt|nextLine|nextBoolean|close|main)(?=\()/g,'<span class="tok-fn">$1</span>');
+  } else {
+    s = s.replace(/\b(git|cd|code|config)\b/g,'<span class="tok-fn">$1</span>');
+  }
+  // 4) restaurar strings
+  s = s.replace(/\u0000(\d+)\u0000/g,(_,i)=>stash[+i]);
+  // 5) añadir comentario resaltado
+  if(comment) s += '<span class="tok-com">'+esc(comment)+'</span>';
+  return s;
+}
+
+function code(lang,file,raw){
+  const id="c"+Math.random().toString(36).slice(2,9);
+  return `<div class="code">
+    <div class="code-bar">
+      <span class="code-file"><span class="dot"></span>${file}</span>
+      <button class="copy-btn" data-code="${id}">Copiar</button>
+    </div>
+    <pre><code id="${id}" data-raw="${esc(raw)}">${highlight(raw,lang)}</code></pre>
+  </div>`;
+}
+
+function q(question, answer){
+  return `<div class="q">
+    <div class="q-head"><div class="q-mark">?</div><div class="q-text">${question}</div></div>
+    <button class="q-reveal">▸ Ver respuesta</button>
+    <div class="q-ans"><span class="a-label">Respuesta</span>${answer}</div>
+  </div>`;
+}
+
+/* ===================== build DOM ===================== */
+const navEl=document.getElementById("nav");
+const secEl=document.getElementById("sections");
+const dotsEl=document.getElementById("dots");
+const seen=new Set();
+let current=0;
+
+SECTIONS.forEach((s,i)=>{
+  // nav
+  const b=document.createElement("button");
+  b.className="nav-item";b.dataset.i=i;
+  b.innerHTML=`<span class="ico">${s.icon}</span><span class="label">${s.nav}</span><span class="check">✓</span>`;
+  b.onclick=()=>goTo(i);
+  navEl.appendChild(b);
+  // section
+  const sec=document.createElement("section");
+  sec.className="section";sec.id="sec-"+s.id;
+  const prev=SECTIONS[i-1], next=SECTIONS[i+1];
+  sec.innerHTML=`
+    <div class="sec-eyebrow"><span class="num">${s.num}</span>${s.eyebrow}</div>
+    <h1 class="sec-title"><span class="emoji">${s.emoji}</span>${s.title}</h1>
+    <p class="sec-lead">${s.lead}</p>
+    ${s.html}
+    <div class="section-foot"><div class="foot-nav">
+      <button class="foot-btn prev" ${prev?"":"disabled"}>
+        <span class="fb-dir">← Anterior</span><span class="fb-title">${prev?prev.nav:"—"}</span></button>
+      <button class="foot-btn next" ${next?"":"disabled"}>
+        <span class="fb-dir">Siguiente →</span><span class="fb-title">${next?next.nav:"—"}</span></button>
+    </div></div>`;
+  secEl.appendChild(sec);
+  // dots
+  const d=document.createElement("span");dotsEl.appendChild(d);
+});
+
+document.querySelectorAll(".foot-btn.prev").forEach((b)=>b.onclick=()=>goTo(current-1));
+document.querySelectorAll(".foot-btn.next").forEach((b)=>b.onclick=()=>goTo(current+1));
+
+/* copy buttons */
+document.addEventListener("click",e=>{
+  const btn=e.target.closest(".copy-btn");
+  if(!btn)return;
+  const el=document.getElementById(btn.dataset.code);
+  const raw=el.getAttribute("data-raw").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"');
+  navigator.clipboard.writeText(raw).then(()=>{
+    btn.textContent="✓ Copiado";btn.classList.add("done");
+    setTimeout(()=>{btn.textContent="Copiar";btn.classList.remove("done");},1600);
+  });
+});
+
+/* reveal answers */
+document.addEventListener("click",e=>{
+  const btn=e.target.closest(".q-reveal");
+  if(!btn)return;
+  const ans=btn.nextElementSibling;
+  const open=ans.classList.toggle("open");
+  btn.textContent=open?"▾ Ocultar respuesta":"▸ Ver respuesta";
+});
+
+/* navigation */
+function goTo(i){
+  if(i<0||i>=SECTIONS.length)return;
+  current=i;
+  document.querySelectorAll(".section").forEach((s,k)=>s.classList.toggle("visible",k===i));
+  document.querySelectorAll(".nav-item").forEach((n,k)=>n.classList.toggle("active",k===i));
+  document.querySelectorAll("#dots span").forEach((d,k)=>d.classList.toggle("on",k===i));
+  seen.add(i);
+  document.querySelectorAll(".nav-item").forEach((n,k)=>{if(seen.has(k))n.classList.add("seen");});
+  updateProgress();
+  document.getElementById("topTitle").textContent=SECTIONS[i].nav;
+  document.getElementById("hudNum").textContent=(i+1)+" / "+SECTIONS.length;
+  document.body.classList.remove("nav-open");
+  if(!document.body.classList.contains("present")){
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+}
+function updateProgress(){
+  const n=seen.size, t=SECTIONS.length;
+  document.getElementById("progTxt").textContent=n+" / "+t;
+  document.getElementById("progFill").style.width=(n/t*100)+"%";
+}
+
+/* present mode */
+const presentBtn=document.getElementById("presentBtn");
+function enterPresent(){
+  document.body.classList.add("present");
+  if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});
+}
+function exitPresent(){
+  document.body.classList.remove("present");
+  if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});
+}
+presentBtn.onclick=enterPresent;
+document.getElementById("presentBtnMobile").onclick=enterPresent;
+document.getElementById("exitPresent").onclick=exitPresent;
+document.addEventListener("fullscreenchange",()=>{if(!document.fullscreenElement)document.body.classList.remove("present");});
+
+/* keyboard */
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowRight"||e.key==="PageDown"){goTo(current+1);}
+  else if(e.key==="ArrowLeft"||e.key==="PageUp"){goTo(current-1);}
+  else if(e.key==="Escape"&&document.body.classList.contains("present")){exitPresent();}
+  else if(e.key==="f"||e.key==="F"){if(!document.body.classList.contains("present"))enterPresent();}
+});
+
+/* mobile nav */
+document.getElementById("hamburger").onclick=()=>document.body.classList.toggle("nav-open");
+document.getElementById("overlay").onclick=()=>document.body.classList.remove("nav-open");
+
+/* init */
+goTo(0);
+</script>
+</body>
+</html>
