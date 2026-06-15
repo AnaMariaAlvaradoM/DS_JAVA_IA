@@ -1,7 +1,6 @@
-
-
-public class Repaso {
-    public static void main(String[] args) {
+public class App {
+    public static void main(String[] args) throws Exception {
+        System.out.println("Hello, World!");
         final double IVA = 0.19;
         final int DIAS_SEMANA = 7;
 
@@ -35,7 +34,5 @@ public class Repaso {
 
         System.out.println(10 % 3);
         System.out.println(10 + 3);
-
-
     }
 }
