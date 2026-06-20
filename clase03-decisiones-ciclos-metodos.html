@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 3 · Decisiones, ciclos y métodos · Java AI Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --morado:#5418CC;
+  --morado-vibrante:#6018F0;
+  --morado-oscuro:#3C1884;
+  --bg:#0d0a17;
+  --bg-2:#140f24;
+  --panel:#171127;
+  --panel-2:#1d1633;
+  --linea:#2a2142;
+  --texto:#ece9f5;
+  --texto-soft:#a79fc4;
+  --texto-mute:#6f6790;
+  --code-bg:#0a0813;
+  --ok:#3ddc97;
+  --warn:#ffb454;
+  --err:#ff6b81;
+  --radius:16px;
+  --sidebar-w:280px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--texto);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(900px 500px at 12% -8%, rgba(96,24,240,.18), transparent 60%),
+    radial-gradient(700px 600px at 105% 110%, rgba(84,24,204,.14), transparent 55%);
+}
+
+/* ---------- LAYOUT ---------- */
+.shell{display:flex;min-height:100vh;position:relative;z-index:1}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar{
+  width:var(--sidebar-w);
+  flex-shrink:0;
+  background:linear-gradient(180deg,var(--bg-2),var(--bg));
+  border-right:1px solid var(--linea);
+  position:sticky;top:0;height:100vh;
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+.brand{padding:22px 22px 16px;border-bottom:1px solid var(--linea)}
+.brand .kicker{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--morado-vibrante);font-weight:700}
+.brand h1{font-size:17px;font-weight:800;margin-top:6px;line-height:1.25}
+.brand .sub{font-size:12px;color:var(--texto-mute);margin-top:4px}
+
+.progress-wrap{padding:14px 22px;border-bottom:1px solid var(--linea)}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--texto-soft);margin-bottom:7px}
+.progress-track{height:7px;background:var(--panel-2);border-radius:99px;overflow:hidden}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--morado),var(--morado-vibrante));border-radius:99px;transition:width .4s ease}
+
+.nav{padding:12px 12px 24px;flex:1}
+.nav a{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 13px;border-radius:11px;
+  color:var(--texto-soft);text-decoration:none;font-size:14px;font-weight:500;
+  transition:.15s;margin-bottom:3px;position:relative;
+}
+.nav a .ic{font-size:17px;width:22px;text-align:center;flex-shrink:0}
+.nav a:hover{background:var(--panel);color:var(--texto)}
+.nav a.active{background:linear-gradient(90deg,rgba(96,24,240,.22),rgba(96,24,240,.05));color:#fff}
+.nav a.active::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:99px;background:var(--morado-vibrante)}
+.nav a.seen .dot{background:var(--ok)}
+.nav a .dot{margin-left:auto;width:8px;height:8px;border-radius:99px;background:var(--linea);flex-shrink:0;transition:.2s}
+
+.present-btn{
+  margin:0 12px 14px;padding:11px;border:1px solid var(--linea);
+  background:var(--panel);color:var(--texto-soft);border-radius:11px;
+  font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;gap:8px;transition:.15s;
+}
+.present-btn:hover{border-color:var(--morado-vibrante);color:#fff;background:var(--panel-2)}
+.present-btn kbd{background:var(--code-bg);border:1px solid var(--linea);border-radius:5px;padding:1px 6px;font-size:10.5px;font-family:'JetBrains Mono',monospace}
+
+/* ---------- MAIN ---------- */
+.main{flex:1;min-width:0}
+.topbar{
+  display:none;align-items:center;gap:12px;padding:12px 16px;
+  border-bottom:1px solid var(--linea);position:sticky;top:0;z-index:30;
+  background:rgba(13,10,23,.9);backdrop-filter:blur(10px);
+}
+.menu-toggle{background:var(--panel);border:1px solid var(--linea);color:var(--texto);border-radius:10px;width:42px;height:42px;font-size:18px;cursor:pointer}
+.topbar .tb-title{font-weight:700;font-size:14px}
+
+.content{max-width:920px;margin:0 auto;padding:46px 40px 90px}
+
+/* ---------- SECTIONS ---------- */
+.section{margin-bottom:64px;scroll-margin-top:24px}
+.section-head{margin-bottom:26px}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.15em;
+  text-transform:uppercase;font-weight:700;color:var(--morado-vibrante);
+  background:rgba(96,24,240,.1);border:1px solid rgba(96,24,240,.25);
+  padding:5px 12px;border-radius:99px;margin-bottom:14px;
+}
+.section h2{font-size:30px;font-weight:800;line-height:1.18;letter-spacing:-.02em}
+.section h2 .emoji{margin-right:10px}
+.lead{color:var(--texto-soft);font-size:16px;margin-top:10px;max-width:62ch}
+
+.section h3{font-size:18px;font-weight:700;margin:30px 0 12px;display:flex;align-items:center;gap:9px}
+.section h3 .tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--morado-vibrante);border:1px solid var(--linea);padding:3px 8px;border-radius:6px}
+.section p{color:var(--texto);margin:11px 0}
+.section p.muted{color:var(--texto-soft)}
+
+/* hero */
+.hero{
+  background:linear-gradient(135deg,rgba(60,24,132,.45),rgba(23,17,39,.6));
+  border:1px solid var(--linea);border-radius:22px;padding:38px 36px;position:relative;overflow:hidden;
+}
+.hero::after{content:"{ }";position:absolute;right:24px;bottom:-22px;font-family:'JetBrains Mono',monospace;font-size:150px;color:rgba(96,24,240,.08);font-weight:700}
+.hero .eyebrow{background:rgba(96,24,240,.18)}
+.hero h2{font-size:34px}
+.goal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+.goal{background:var(--panel);border:1px solid var(--linea);border-radius:14px;padding:16px}
+.goal .gi{font-size:22px}
+.goal b{display:block;margin-top:8px;font-size:14px}
+.goal span{font-size:12.5px;color:var(--texto-soft)}
+
+/* cards */
+.card{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radius);padding:22px 24px;margin:18px 0}
+.def{border-left:3px solid var(--morado-vibrante)}
+.def .def-t{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--morado-vibrante);font-weight:700;margin-bottom:8px}
+
+/* analogy / real life */
+.real{display:flex;gap:14px;align-items:flex-start;background:var(--panel-2);border:1px solid var(--linea);border-radius:14px;padding:16px 18px;margin:16px 0}
+.real .ri{font-size:22px;flex-shrink:0;margin-top:2px}
+.real .rt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-mute);font-weight:700;margin-bottom:3px}
+
+/* think block */
+.think{
+  background:linear-gradient(135deg,rgba(96,24,240,.12),rgba(23,17,39,.4));
+  border:1px solid rgba(96,24,240,.32);border-radius:16px;padding:20px 22px;margin:20px 0;
+}
+.think .q{display:flex;gap:11px;align-items:flex-start;font-weight:600;font-size:15.5px}
+.think .q .qi{font-size:20px;flex-shrink:0}
+.reveal-btn{
+  margin-top:14px;background:var(--morado);color:#fff;border:none;border-radius:10px;
+  padding:9px 18px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;transition:.15s;
+}
+.reveal-btn:hover{background:var(--morado-vibrante)}
+.reveal-btn .chev{transition:transform .25s}
+.reveal-btn.open .chev{transform:rotate(180deg)}
+.answer{max-height:0;overflow:hidden;transition:max-height .35s ease,margin .35s ease,opacity .3s;opacity:0}
+.answer.open{max-height:600px;margin-top:14px;opacity:1}
+.answer .inner{background:var(--code-bg);border:1px solid var(--linea);border-left:3px solid var(--ok);border-radius:12px;padding:16px 18px;font-size:14.5px}
+.answer .inner b{color:var(--ok)}
+
+/* tips / warnings */
+.banner{display:flex;gap:13px;align-items:flex-start;border-radius:13px;padding:15px 18px;margin:16px 0;font-size:14.5px;border:1px solid}
+.banner .bi{font-size:19px;flex-shrink:0;margin-top:1px}
+.banner.tip{background:rgba(61,220,151,.08);border-color:rgba(61,220,151,.3)}
+.banner.warn{background:rgba(255,180,84,.08);border-color:rgba(255,180,84,.32)}
+.banner.err{background:rgba(255,107,129,.08);border-color:rgba(255,107,129,.32)}
+.banner b{color:#fff}
+
+/* file label */
+.filechip{
+  display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;background:var(--panel-2);border:1px solid var(--linea);
+  border-radius:8px;padding:5px 11px;color:var(--texto-soft);margin:14px 0 8px;
+}
+.filechip .fi{color:var(--morado-vibrante)}
+.filechip b{color:var(--texto)}
+
+/* code */
+.code{position:relative;background:var(--code-bg);border:1px solid var(--linea);border-radius:13px;margin:6px 0 16px;overflow:hidden}
+.code-top{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--linea);background:rgba(255,255,255,.015)}
+.code-top .dots{display:flex;gap:6px}
+.code-top .dots i{width:11px;height:11px;border-radius:99px;display:block}
+.code-top .dots i:nth-child(1){background:#ff5f57}.code-top .dots i:nth-child(2){background:#febc2e}.code-top .dots i:nth-child(3){background:#28c840}
+.code-top .lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--texto-mute)}
+.copy-btn{background:transparent;border:1px solid var(--linea);color:var(--texto-soft);border-radius:7px;padding:4px 11px;font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;transition:.15s}
+.copy-btn:hover{border-color:var(--morado-vibrante);color:#fff}
+.copy-btn.done{color:var(--ok);border-color:var(--ok)}
+pre{margin:0;padding:16px 18px;overflow-x:auto}
+code,pre{font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.65}
+.tok-key{color:#c792ea}.tok-type{color:#82aaff}.tok-str{color:#c3e88d}.tok-num{color:#f78c6c}.tok-com{color:#5a6582;font-style:italic}.tok-fn{color:#82d2ff}
+
+/* progressive app panel */
+.appnow{background:linear-gradient(135deg,rgba(60,24,132,.3),var(--panel));border:1px solid var(--morado-oscuro);border-radius:16px;padding:20px 22px;margin:24px 0}
+.appnow .an-head{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;margin-bottom:6px}
+.appnow .an-head .pill{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--morado);color:#fff;padding:3px 9px;border-radius:6px}
+.appnow p.muted{font-size:13.5px;margin-bottom:10px}
+
+/* inline svg infographic */
+.figure{background:var(--panel);border:1px solid var(--linea);border-radius:16px;padding:22px;margin:20px 0}
+.figure .cap{font-size:12px;color:var(--texto-mute);text-align:center;margin-top:12px}
+.svg-text{font-family:'Inter',sans-serif;fill:var(--texto)}
+.svg-mono{font-family:'JetBrains Mono',monospace}
+
+/* table */
+.tbl{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;overflow:hidden;border-radius:12px;border:1px solid var(--linea)}
+.tbl th{background:var(--panel-2);text-align:left;padding:11px 14px;font-size:12.5px;letter-spacing:.04em;color:var(--morado-vibrante);font-weight:700}
+.tbl td{padding:11px 14px;border-top:1px solid var(--linea);color:var(--texto-soft)}
+.tbl td code{color:var(--texto);background:var(--code-bg);padding:2px 7px;border-radius:5px;font-size:12.5px}
+.tbl tr:hover td{background:rgba(96,24,240,.04)}
+
+/* exercises */
+.ex-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:18px}
+.ex{background:var(--panel);border:1px solid var(--linea);border-radius:14px;padding:18px 20px;transition:.15s}
+.ex:hover{border-color:var(--morado-vibrante);transform:translateY(-2px)}
+.ex .ex-h{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ex .ex-n{width:30px;height:30px;border-radius:9px;background:var(--morado);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
+.ex .ex-t{font-weight:700;font-size:14.5px}
+.ex p{font-size:13.5px;color:var(--texto-soft);margin:0}
+
+/* footer */
+.foot{border-top:1px solid var(--linea);padding:24px 40px;text-align:center;color:var(--texto-mute);font-size:12px}
+.foot a{color:var(--texto-soft);text-decoration:none}
+.foot a:hover{color:var(--morado-vibrante)}
+
+/* ---------- PRESENTATION MODE ---------- */
+body.present .sidebar,body.present .topbar,body.present .foot{display:none}
+body.present .main{height:100vh;overflow:hidden}
+body.present .content{max-width:none;height:100vh;margin:0;padding:0;display:flex}
+body.present .section{
+  display:none;margin:0;width:100vw;height:100vh;overflow-y:auto;
+  padding:7vh 9vw;align-content:start;scroll-margin:0;
+}
+body.present .section.slide-active{display:block;animation:slideIn .4s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+body.present .section h2{font-size:42px}
+body.present .lead{font-size:20px}
+.present-hud{display:none}
+body.present .present-hud{
+  display:flex;align-items:center;gap:16px;position:fixed;bottom:20px;left:50%;
+  transform:translateX(-50%);z-index:100;background:rgba(20,15,36,.92);
+  border:1px solid var(--linea);border-radius:99px;padding:9px 20px;backdrop-filter:blur(8px);
+}
+.present-hud .ph-nav{background:var(--panel-2);border:1px solid var(--linea);color:var(--texto);width:34px;height:34px;border-radius:99px;cursor:pointer;font-size:15px}
+.present-hud .ph-nav:hover{border-color:var(--morado-vibrante)}
+.present-hud .ph-count{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--texto-soft);min-width:54px;text-align:center}
+.present-hud .ph-exit{font-size:11px;color:var(--texto-mute)}
+.present-hud .ph-exit kbd{background:var(--code-bg);border:1px solid var(--linea);border-radius:4px;padding:1px 6px;font-family:'JetBrains Mono',monospace}
+body.present .present-progress{display:block;position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--morado),var(--morado-vibrante));z-index:101;transition:width .3s}
+.present-progress{display:none}
+
+/* ---------- RESPONSIVE ---------- */
+.backdrop{display:none}
+@media(max-width:880px){
+  .sidebar{position:fixed;left:0;top:0;z-index:50;transform:translateX(-100%);transition:transform .28s ease;box-shadow:0 0 60px rgba(0,0,0,.5)}
+  .sidebar.open{transform:none}
+  .topbar{display:flex}
+  .content{padding:26px 18px 70px}
+  .goal-grid{grid-template-columns:1fr}
+  .ex-grid{grid-template-columns:1fr}
+  .section h2{font-size:25px}
+  .hero{padding:26px 22px}
+  .backdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40}
+  body.present .section{padding:6vh 7vw}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="present-progress" id="presentProgress"></div>
+<div class="shell">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="kicker">Java AI Engineer · Dev Senior</div>
+    <h1>Clase 3</h1>
+    <div class="sub">Decisiones, ciclos, métodos y organización</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Tu avance</span><span id="progressPct">0%</span></div>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+  <nav class="nav" id="nav"></nav>
+  <button class="present-btn" id="presentBtn">▶ Modo presentación <kbd>P</kbd></button>
+</aside>
+<div class="backdrop" id="backdrop"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <button class="menu-toggle" id="menuToggle">☰</button>
+    <div class="tb-title">Clase 3 · Java AI Engineer</div>
+  </div>
+  <main class="content" id="content">
+<!-- ============ S0: INTRO / HERO ============ -->
+<section class="section" id="inicio" data-title="Inicio" data-icon="🎯">
+  <div class="hero">
+    <div class="eyebrow">Módulo 1 · Clase 3</div>
+    <h2>Hoy el programa aprende a pensar</h2>
+    <p class="lead">Hasta ahora tu código era una línea recta. Hoy aprende a <b>decidir</b>, a <b>repetir trabajo</b> y a <b>organizar su lógica</b> en piezas reutilizables. Y no lo veremos suelto: construiremos juntos una sola aplicación que crece paso a paso — el <b>Cajero de un restaurante</b> 🍽️.</p>
+    <div class="goal-grid">
+      <div class="goal"><div class="gi">🔀</div><b>Decidir</b><span>if · else if · switch</span></div>
+      <div class="goal"><div class="gi">🔁</div><b>Repetir</b><span>for · while · do while</span></div>
+      <div class="goal"><div class="gi">🧩</div><b>Organizar</b><span>métodos y clases</span></div>
+    </div>
+  </div>
+
+  <h3>El hilo conductor: el Cajero 🧾</h3>
+  <p class="muted">Es una caja registradora simple. En cada sección le sumamos una pieza nueva y al final tendrás una app completa que funciona:</p>
+  <div class="figure">
+    <svg viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Las piezas del Cajero que se construyen en clase">
+      <defs>
+        <linearGradient id="gline" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#5418CC"/><stop offset="1" stop-color="#6018F0"/>
+        </linearGradient>
+      </defs>
+      <line x1="60" y1="110" x2="700" y2="110" stroke="url(#gline)" stroke-width="3"/>
+      <!-- nodes -->
+      <g text-anchor="middle">
+        <circle cx="80" cy="110" r="22" fill="#1d1633" stroke="#6018F0" stroke-width="2"/>
+        <text x="80" y="116" font-size="18">📥</text>
+        <text class="svg-text" x="80" y="160" font-size="12" font-weight="700">Recibe</text>
+        <text class="svg-text" x="80" y="178" font-size="10.5" fill="#a79fc4">datos</text>
+
+        <circle cx="204" cy="110" r="22" fill="#1d1633" stroke="#6018F0" stroke-width="2"/>
+        <text x="204" y="116" font-size="18">🔀</text>
+        <text class="svg-text" x="204" y="160" font-size="12" font-weight="700">Decide</text>
+        <text class="svg-text" x="204" y="178" font-size="10.5" fill="#a79fc4">descuento</text>
+
+        <circle cx="328" cy="110" r="22" fill="#1d1633" stroke="#6018F0" stroke-width="2"/>
+        <text x="328" y="116" font-size="18">📋</text>
+        <text class="svg-text" x="328" y="160" font-size="12" font-weight="700">Menú</text>
+        <text class="svg-text" x="328" y="178" font-size="10.5" fill="#a79fc4">switch</text>
+
+        <circle cx="452" cy="110" r="22" fill="#1d1633" stroke="#6018F0" stroke-width="2"/>
+        <text x="452" y="116" font-size="18">🔁</text>
+        <text class="svg-text" x="452" y="160" font-size="12" font-weight="700">Repite</text>
+        <text class="svg-text" x="452" y="178" font-size="10.5" fill="#a79fc4">do while</text>
+
+        <circle cx="576" cy="110" r="22" fill="#1d1633" stroke="#6018F0" stroke-width="2"/>
+        <text x="576" y="116" font-size="18">🧮</text>
+        <text class="svg-text" x="576" y="160" font-size="12" font-weight="700">Calcula</text>
+        <text class="svg-text" x="576" y="178" font-size="10.5" fill="#a79fc4">métodos</text>
+
+        <circle cx="700" cy="110" r="22" fill="#5418CC" stroke="#6018F0" stroke-width="2"/>
+        <text x="700" y="116" font-size="18">🧩</text>
+        <text class="svg-text" x="700" y="160" font-size="12" font-weight="700">Organiza</text>
+        <text class="svg-text" x="700" y="178" font-size="10.5" fill="#a79fc4">clases</text>
+
+        <text class="svg-text" x="80" y="60" font-size="11" fill="#6f6790" font-weight="700">PASO 0</text>
+        <text class="svg-text" x="700" y="60" font-size="11" fill="#6018F0" font-weight="700">APP FINAL</text>
+      </g>
+    </svg>
+    <div class="cap">Cada sección agrega una pieza. Al terminar, el Cajero funciona de principio a fin.</div>
+  </div>
+</section>
+
+<!-- ============ S1: HERRAMIENTAS BASE ============ -->
+<section class="section" id="base" data-title="Herramientas base" data-icon="🧰">
+  <div class="section-head">
+    <div class="eyebrow">Repaso rápido</div>
+    <h2><span class="emoji">🧰</span>Las tres herramientas base</h2>
+    <p class="lead">Antes de arrancar el Cajero necesitamos tres cosas: leer datos del usuario, combinar condiciones y convertir tipos. Sin ellas, el resto no se sostiene.</p>
+  </div>
+
+  <h3><span class="tag">1</span>Scanner — leer datos del usuario</h3>
+  <div class="card def">
+    <div class="def-t">Definición</div>
+    <p><code>Scanner</code> es una clase de Java que lee lo que el usuario escribe por teclado.</p>
+  </div>
+  <div class="real"><div class="ri">📝</div><div><div class="rt">En la vida real</div>Es como un formulario: el programa pregunta, el usuario responde, y esa respuesta queda guardada en una variable.</div></div>
+  <p>Para usar <code>Scanner</code> hay que <b>importarlo</b> arriba del archivo y <b>crearlo</b> dentro del <code>main</code>.</p>
+  <div class="filechip"><span class="fi">📁</span> Crea <b>Repaso.java</b> en la raíz del proyecto · córrelo con el botón ▶ Run (o F5)</div>
+  <div class="code" data-lang="Repaso.java"><pre><code>import java.util.Scanner;
+
+public class Repaso {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Nombre del cliente: ");
+        String nombre = sc.nextLine();
+
+        System.out.print("Cuantas personas en la mesa? ");
+        int personas = sc.nextInt();
+
+        System.out.println("Mesa de " + nombre + ", " + personas + " personas.");
+    }
+}</code></pre></div>
+
+  <div class="think">
+    <div class="q"><span class="qi">🤔</span><span>¿Por qué para el nombre uso <code>nextLine()</code> y para las personas <code>nextInt()</code>?</span></div>
+    <button class="reveal-btn">Ver respuesta <span class="chev">▾</span></button>
+    <div class="answer"><div class="inner">Cada uno lee un <b>tipo distinto</b>: <code>nextLine()</code> lee texto (<code>String</code>), <code>nextInt()</code> lee un entero, <code>nextDouble()</code> lee un decimal. El método debe coincidir con el tipo que esperas recibir.</div></div>
+  </div>
+
+  <div class="banner warn"><span class="bi">⚠️</span><div><b>Error clásico que te va a perseguir:</b> si lees primero con <code>nextInt()</code> y luego con <code>nextLine()</code>, el texto sale en blanco. Al leer el número, <code>nextInt()</code> deja el Enter pendiente y el <code>nextLine()</code> se lo "come". <b>Solución:</b> pon un <code>sc.nextLine()</code> extra después del <code>nextInt()</code> para limpiar ese Enter.</div></div>
+
+  <h3><span class="tag">2</span>Operadores lógicos — combinar condiciones</h3>
+  <div class="real"><div class="ri">🎟️</div><div><div class="rt">Caso real</div>El descuento aplica si la cuenta supera 100.000 <b>Y</b> el cliente tiene cupón. No basta con cumplir una sola.</div></div>
+  <table class="tbl">
+    <tr><th>Operador</th><th>Nombre</th><th>Da <code>true</code> cuando…</th></tr>
+    <tr><td><code>&amp;&amp;</code></td><td>AND (y)</td><td>ambas condiciones son verdaderas</td></tr>
+    <tr><td><code>||</code></td><td>OR (o)</td><td>al menos una es verdadera</td></tr>
+    <tr><td><code>!</code></td><td>NOT (no)</td><td>invierte el valor</td></tr>
+  </table>
+  <div class="filechip"><span class="fi">📁</span> En <b>Repaso.java</b>, dentro del main</div>
+  <div class="code" data-lang="Java"><pre><code>double subtotal = 120000;
+boolean tieneCupon = true;
+
+boolean aplicaDescuento = subtotal > 100000 &amp;&amp; tieneCupon;
+System.out.println("Aplica descuento? " + aplicaDescuento);</code></pre></div>
+  <div class="real"><div class="ri">🌍</div><div><div class="rt">Cada uno en la vida real</div><b>&amp;&amp;</b> → para conducir necesitas licencia <b>Y</b> carro. &nbsp;<b>||</b> → pagas con efectivo <b>O</b> tarjeta. &nbsp;<b>!</b> → "<b>no</b> está disponible": invierte el estado.</div></div>
+  <div class="think">
+    <div class="q"><span class="qi">🤔</span><span>Si <code>tieneCupon</code> fuera <code>false</code>, ¿qué imprime y por qué?</span></div>
+    <button class="reveal-btn">Ver respuesta <span class="chev">▾</span></button>
+    <div class="answer"><div class="inner">Imprime <b>false</b>. Aunque el subtotal supere 100.000, el <code>&amp;&amp;</code> exige que <b>las dos</b> condiciones se cumplan.</div></div>
+  </div>
+
+  <h3><span class="tag">3</span>Conversión de tipos</h3>
+  <div class="real"><div class="ri">💰</div><div><div class="rt">Caso real</div>Si divides la cuenta entre los comensales y guardas el resultado en un <code>int</code>, los centavos se <b>pierden</b>: un <code>int</code> no guarda decimales, los recorta.</div></div>
+  <div class="card def">
+    <div class="def-t">Definición</div>
+    <p><b>Implícita (automática):</b> de un tipo pequeño a uno grande. Java lo hace solo y no se pierde nada. Ej: <code>int → double</code>.</p>
+    <p><b>Explícita (casting):</b> de un tipo grande a uno pequeño. La fuerzas tú con <code>(tipo)</code> y puede perder información. Ej: <code>double → int</code>.</p>
+  </div>
+  <div class="filechip"><span class="fi">📁</span> En <b>Repaso.java</b></div>
+  <div class="code" data-lang="Java"><pre><code>int unidades = 5;
+double comoDecimal = unidades;
+System.out.println("Implicita: " + comoDecimal);   // 5.0
+
+double precio = 19990.75;
+int precioRecortado = (int) precio;
+System.out.println("Casting: " + precioRecortado);  // 19990</code></pre></div>
+  <div class="real"><div class="ri">🥤</div><div><div class="rt">Analogía</div>Implícita = pasar agua de un vaso pequeño a uno grande: cabe sin problema. Explícita = del grande al pequeño: hay que forzarlo y se derrama (se pierde) lo que no cabe.</div></div>
+
+  <div class="appnow">
+    <div class="an-head"><span class="pill">Así va la app</span> 🧾 El Cajero arranca</div>
+    <p class="muted">Por ahora solo <b>recibe</b> los datos de la cuenta. Es la base de todo lo que sigue.</p>
+    <div class="filechip"><span class="fi">📁</span> <b>Cajero.java</b> — el corazón de la app</div>
+    <div class="code" data-lang="Cajero.java"><pre><code>import java.util.Scanner;
+
+public class Cajero {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Subtotal de la cuenta: ");
+        double subtotal = sc.nextDouble();
+
+        System.out.print("El cliente tiene cupon? (true/false): ");
+        boolean tieneCupon = sc.nextBoolean();
+
+        System.out.println("Cuenta registrada: " + subtotal + " | cupon: " + tieneCupon);
+    }
+}</code></pre></div>
+  </div>
+</section>
+
+<!-- ============ S2: CONDICIONALES ============ -->
+<section class="section" id="condicionales" data-title="Condicionales" data-icon="🔀">
+  <div class="section-head">
+    <div class="eyebrow">Bloque 1</div>
+    <h2><span class="emoji">🔀</span>Que el programa decida</h2>
+    <p class="lead">El Cajero debe aplicar descuento solo si la cuenta supera cierto monto. ¿Cómo sabe cuándo sí y cuándo no? Evaluando una <b>condición</b> y tomando caminos distintos según el resultado.</p>
+  </div>
+
+  <div class="card def">
+    <div class="def-t">Definición</div>
+    <p>Un <b>condicional</b> ejecuta un bloque de código solo si una condición es verdadera (<code>true</code>).</p>
+  </div>
+  <div class="real"><div class="ri">☔</div><div><div class="rt">En la vida real</div>"<b>Si</b> llueve, <b>entonces</b> llevo paraguas; <b>si no</b>, salgo sin él."</div></div>
+
+  <h3><span class="tag">Ej. 1</span>if simple</h3>
+  <div class="filechip"><span class="fi">📁</span> Crea <b>Decisiones.java</b> en la raíz</div>
+  <div class="code" data-lang="Decisiones.java"><pre><code>public class Decisiones {
+    public static void main(String[] args) {
+        double cuenta = 150000;
+
+        if (cuenta > 100000) {
+            System.out.println("Aplica descuento");
+        }
+    }
+}</code></pre></div>
+  <p class="muted">Esto solo cubre un caso. ¿Y si no aplica? Falta el otro camino.</p>
+
+  <h3><span class="tag">Ej. 2</span>if / else if / else</h3>
+  <p>Cubrimos <b>todos</b> los casos, clasificando la cuenta por monto:</p>
+  <div class="filechip"><span class="fi">📁</span> En <b>Decisiones.java</b> (reemplaza el main)</div>
+  <div class="code" data-lang="Java"><pre><code>double cuenta = 150000;
+
+if (cuenta >= 200000) {
+    System.out.println("Descuento VIP (15%)");
+} else if (cuenta > 100000) {
+    System.out.println("Descuento normal (10%)");
+} else {
+    System.out.println("Sin descuento");
+}</code></pre></div>
+
+  <div class="think">
+    <div class="q"><span class="qi">🤔</span><span>Si la cuenta es 250.000, ¿por qué <b>no</b> imprime también "Descuento normal"? (250.000 también es &gt; 100.000)</span></div>
+    <button class="reveal-btn">Ver respuesta <span class="chev">▾</span></button>
+    <div class="answer"><div class="inner">Imprime <b>solo "Descuento VIP"</b>. Las condiciones se evalúan <b>en orden</b> y, en cuanto una se cumple, Java ejecuta esa y se sale de toda la cadena. No revisa las demás.</div></div>
+  </div>
+
+  <div class="banner err"><span class="bi">🚫</span><div><b>Error típico:</b> comparar con <code>=</code> en vez de <code>==</code>, como <code>if (cuenta = 100000)</code>. No compila: <code>=</code> asigna, <code>==</code> compara. Java espera una condición, no una asignación. El error se lee como <i>"incompatible types: ... cannot be converted to boolean"</i>.</div></div>
+  <div class="banner warn"><span class="bi">⚠️</span><div><b>Cuidado con dos detalles:</b> poner <code>;</code> justo después del <code>if (...)</code> "vacía" el if y el bloque corre siempre. Y el <b>orden importa</b>: si pones la condición más amplia primero, las específicas nunca se alcanzan.</div></div>
+
+  <div class="appnow">
+    <div class="an-head"><span class="pill">Así va la app</span> 🧾 El Cajero ahora decide</div>
+    <p class="muted">Decide el descuento según el monto de la cuenta.</p>
+    <div class="filechip"><span class="fi">📁</span> <b>Cajero.java</b></div>
+    <div class="code" data-lang="Cajero.java"><pre><code>import java.util.Scanner;
+
+public class Cajero {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Subtotal de la cuenta: ");
+        double subtotal = sc.nextDouble();
+
+        if (subtotal >= 200000) {
+            System.out.println("Descuento VIP aplicado");
+        } else if (subtotal > 100000) {
+            System.out.println("Descuento normal aplicado");
+        } else {
+            System.out.println("Sin descuento");
+        }
+    }
+}</code></pre></div>
+  </div>
+</section>
+
+<!-- ============ S3: SWITCH ============ -->
+<section class="section" id="switch" data-title="switch" data-icon="📋">
+  <div class="section-head">
+    <div class="eyebrow">Bloque 2</div>
+    <h2><span class="emoji">📋</span>Muchas opciones exactas: switch</h2>
+    <p class="lead">El Cajero tiene un menú: 1 nuevo pedido, 2 aplicar descuento, 3 cerrar caja. Podrías escribir un <code>else if</code> por cada número, pero cuando comparas un mismo valor contra varias opciones exactas, el <code>switch</code> es más legible.</p>
+  </div>
+
+  <div class="card def">
+    <div class="def-t">Definición</div>
+    <p><code>switch</code> evalúa una variable y salta directo al <code>case</code> que coincide.</p>
+  </div>
+  <div class="real"><div class="ri">🏧</div><div><div class="rt">En la vida real</div>El menú del cajero automático: marcas una opción y ejecuta esa, no las demás.</div></div>
+
+  <h3><span class="tag">Ej. 1</span>switch con int (el menú)</h3>
+  <div class="filechip"><span class="fi">📁</span> Crea <b>Opciones.java</b> en la raíz</div>
+  <div class="code" data-lang="Opciones.java"><pre><code>public class Opciones {
+    public static void main(String[] args) {
+        int opcion = 2;
+
+        switch (opcion) {
+            case 1:
+                System.out.println("Nuevo pedido");
+                break;
+            case 2:
+                System.out.println("Aplicar descuento");
+                break;
+            case 3:
+                System.out.println("Cerrar caja");
+                break;
+            default:
+                System.out.println("Opcion invalida");
+        }
+    }
+}</code></pre></div>
+
+  <div class="banner err"><span class="bi">🚫</span><div><b>Si quitas los <code>break</code>:</b> ocurre el <i>fall-through</i>. Al entrar a un <code>case</code>, sigue ejecutando los siguientes hasta hallar un <code>break</code> o terminar. En esta forma clásica el <code>break</code> es obligatorio.</div></div>
+
+  <h3>🔎 ¿El switch solo recibe números?</h3>
+  <div class="think">
+    <div class="q"><span class="qi">🤔</span><span>¿Un <code>switch</code> solo sirve con <code>int</code>, o puede comparar también texto?</span></div>
+    <button class="reveal-btn">Ver respuesta <span class="chev">▾</span></button>
+    <div class="answer"><div class="inner">También sirve con texto y más. Según la documentación oficial de Oracle, un <code>switch</code> acepta: enteros <b>byte, short, char, int</b> (y sus envoltorios Byte, Short, Character, Integer), <b>String</b> (desde Java 7) y tipos <b>enum</b> (desde Java 5). <br><br><b>No</b> acepta: <code>boolean</code>, <code>long</code>, <code>float</code> ni <code>double</code>.</div></div>
+  </div>
+
+  <h3><span class="tag">Ej. 2</span>switch con String (por nombre)</h3>
+  <div class="filechip"><span class="fi">📁</span> En <b>Opciones.java</b> (reemplaza el main)</div>
+  <div class="code" data-lang="Java"><pre><code>String comando = "descuento";
+
+switch (comando) {
+    case "pedido":
+        System.out.println("Nuevo pedido");
+        break;
+    case "descuento":
+        System.out.println("Aplicar descuento");
+        break;
+    case "cerrar":
+        System.out.println("Cerrar caja");
+        break;
+    default:
+        System.out.println("Comando no reconocido");
+}</code></pre></div>
+  <div class="banner warn"><span class="bi">⚠️</span><div>Si la variable <code>String</code> llega en <code>null</code>, el <code>switch</code> lanza <code>NullPointerException</code>. Asegúrate de que traiga un valor.</div></div>
+
+  <div class="banner tip"><span class="bi">🌟</span><div><b>Java moderno:</b> desde Java 14 existe la forma con flecha <code>-&gt;</code> que <b>no necesita break</b> y evita el fall-through. Primero domina la forma clásica para entender el flujo; en proyectos reales se prefiere la flecha porque elimina el error del break olvidado.</div></div>
+  <div class="code" data-lang="Java"><pre><code>switch (opcion) {
+    case 1 -> System.out.println("Nuevo pedido");
+    case 2 -> System.out.println("Aplicar descuento");
+    case 3 -> System.out.println("Cerrar caja");
+    default -> System.out.println("Opcion invalida");
+}</code></pre></div>
+
+  <div class="banner tip"><span class="bi">💡</span><div><code>switch</code> compara valores <b>exactos</b>, no rangos como <code>&gt;= 90</code> — para eso usa <code>if / else if</code>. El <code>default</code> no es obligatorio, pero es buena práctica para cubrir lo inesperado.</div></div>
+
+  <div class="appnow">
+    <div class="an-head"><span class="pill">Así va la app</span> 🧾 El Cajero muestra menú</div>
+    <p class="muted">Ahora muestra un menú y elige acción con <code>switch</code>. (Por ahora aparece una sola vez; en la siguiente sección lo haremos repetirse.)</p>
+    <div class="filechip"><span class="fi">📁</span> <b>Cajero.java</b></div>
+    <div class="code" data-lang="Cajero.java"><pre><code>import java.util.Scanner;
+
+public class Cajero {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("--- CAJERO ---");
+        System.out.println("1. Nuevo pedido");
+        System.out.println("2. Cerrar caja");
+        System.out.print("Elige una opcion: ");
+        int opcion = sc.nextInt();
+
+        switch (opcion) {
+            case 1:
+                System.out.print("Subtotal: ");
+                double subtotal = sc.nextDouble();
+                if (subtotal > 100000) {
+                    System.out.println("Pedido con descuento");
+                } else {
+                    System.out.println("Pedido sin descuento");
+                }
+                break;
+            case 2:
+                System.out.println("Caja cerrada");
+                break;
+            default:
+                System.out.println("Opcion invalida");
+        }
+    }
+}</code></pre></div>
+  </div>
+</section>
+
+<!-- ============ S4: CICLOS ============ -->
+<section class="section" id="ciclos" data-title="Ciclos" data-icon="🔁">
+  <div class="section-head">
+    <div class="eyebrow">Bloque 3</div>
+    <h2><span class="emoji">🔁</span>Repetir sin copiar: ciclos</h2>
+    <p class="lead">El Cajero atiende muchos pedidos en un turno. ¿Lanzas el programa de nuevo por cada uno? No: cuando una acción se repite, usamos un <b>ciclo</b> — escribimos la lógica una vez y le decimos cuántas (o hasta cuándo) correr.</p>
+  </div>
+
+  <div class="card def">
+    <div class="def-t">Definición</div>
+    <p>Un <b>ciclo</b> ejecuta un bloque varias veces mientras se cumpla una condición.</p>
+  </div>
+
+  <div class="figure">
+    <svg viewBox="0 0 720 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Comparación de los tres ciclos">
+      <g>
+        <rect x="20" y="20" width="210" height="110" rx="12" fill="#171127" stroke="#2a2142"/>
+        <text class="svg-text svg-mono" x="40" y="48" font-size="15" fill="#82aaff" font-weight="700">for</text>
+        <text class="svg-text" x="40" y="76" font-size="12.5">Cuando SÍ sé</text>
+        <text class="svg-text" x="40" y="95" font-size="12.5">cuántas veces.</text>
+        <text class="svg-text" x="40" y="118" font-size="11" fill="#a79fc4">inicio · condición · avance</text>
+
+        <rect x="255" y="20" width="210" height="110" rx="12" fill="#171127" stroke="#2a2142"/>
+        <text class="svg-text svg-mono" x="275" y="48" font-size="15" fill="#c792ea" font-weight="700">while</text>
+        <text class="svg-text" x="275" y="76" font-size="12.5">Cuando NO sé</text>
+        <text class="svg-text" x="275" y="95" font-size="12.5">cuántas, pero</text>
+        <text class="svg-text" x="275" y="118" font-size="11" fill="#a79fc4">sé la condición de parada</text>
+
+        <rect x="490" y="20" width="210" height="110" rx="12" fill="#1d1633" stroke="#6018F0"/>
+        <text class="svg-text svg-mono" x="510" y="48" font-size="15" fill="#c3e88d" font-weight="700">do while</text>
+        <text class="svg-text" x="510" y="76" font-size="12.5">Corre al menos</text>
+        <text class="svg-text" x="510" y="95" font-size="12.5">UNA vez sí o sí.</text>
+        <text class="svg-text" x="510" y="118" font-size="11" fill="#a79fc4">ideal para menús</text>
+      </g>
+    </svg>
+    <div class="cap">Mismo objetivo —repetir— pero cada uno encaja en un escenario distinto.</div>
+  </div>
+
+  <h3><span class="tag">for</span>cuando sí sé cuántas veces</h3>
+  <div class="think">
+    <div class="q"><span class="qi">🤔</span><span>¿Qué necesita un ciclo para no repetirse infinitamente?</span></div>
+    <button class="reveal-btn">Ver respuesta <span class="chev">▾</span></button>
+    <div class="answer"><div class="inner">Tres partes: <b>inicio</b> (desde dónde), <b>condición</b> (hasta cuándo) y <b>avance</b> (cómo cambia). Sin avance, nunca termina.</div></div>
+  </div>
+  <div class="filechip"><span class="fi">📁</span> Crea <b>Ciclos.java</b> en la raíz</div>
+  <div class="code" data-lang="Ciclos.java"><pre><code>public class Ciclos {
+    public static void main(String[] args) {
+        for (int i = 1; i <= 5; i++) {
+            System.out.println("Plato #" + i + " impreso en el recibo");
+        }
+    }
+}</code></pre></div>
+  <p class="muted">Otro <code>for</code>, esta vez sumando un acumulado:</p>
+  <div class="code" data-lang="Java"><pre><code>int totalPlatos = 0;
+for (int i = 1; i <= 4; i++) {
+    totalPlatos = totalPlatos + 1;
+}
+System.out.println("Total de platos: " + totalPlatos);</code></pre></div>
+  <div class="banner tip"><span class="bi">💡</span><div>En <code>(int i = 1; i &lt;= 5; i++)</code>: <code>int i = 1</code> es el <b>inicio</b>, <code>i &lt;= 5</code> es la <b>condición</b>, <code>i++</code> es el <b>avance</b> (suma 1 cada vuelta).</div></div>
+
+  <h3><span class="tag">while</span>cuando sé la condición de parada</h3>
+  <div class="code" data-lang="Java"><pre><code>int mesasPorLimpiar = 3;
+while (mesasPorLimpiar > 0) {
+    System.out.println("Faltan " + mesasPorLimpiar + " mesas");
+    mesasPorLimpiar--;
+}
+System.out.println("Todo limpio!");</code></pre></div>
+  <p class="muted">Otro ejemplo: vaciar una fila de clientes.</p>
+  <div class="code" data-lang="Java"><pre><code>int clientesEnFila = 5;
+while (clientesEnFila > 0) {
+    System.out.println("Atendiendo cliente, quedan " + (clientesEnFila - 1));
+    clientesEnFila--;
+}</code></pre></div>
+
+  <h3><span class="tag">do while</span>al menos una vez sí o sí</h3>
+  <div class="real"><div class="ri">📋</div><div><div class="rt">Caso real</div>El menú del Cajero debe mostrarse al menos una vez, aunque el usuario quiera cerrar de inmediato. El <code>do while</code> ejecuta primero y revisa la condición después.</div></div>
+  <div class="filechip"><span class="fi">📁</span> En <b>Ciclos.java</b> (reemplaza el main · necesita el import de Scanner)</div>
+  <div class="code" data-lang="Ciclos.java"><pre><code>import java.util.Scanner;
+
+public class Ciclos {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int opcion;
+
+        do {
+            System.out.println("1. Continuar   2. Salir");
+            System.out.print("Elige: ");
+            opcion = sc.nextInt();
+        } while (opcion != 2);
+
+        System.out.println("Saliste del menu");
+    }
+}</code></pre></div>
+  <p class="muted">Otro uso muy común: pedir un dato válido sí o sí.</p>
+  <div class="code" data-lang="Java"><pre><code>Scanner sc = new Scanner(System.in);
+int edad;
+
+do {
+    System.out.print("Edad del cliente (mayor a 0): ");
+    edad = sc.nextInt();
+} while (edad <= 0);
+
+System.out.println("Edad valida: " + edad);</code></pre></div>
+  <div class="think">
+    <div class="q"><span class="qi">🤔</span><span>¿En qué se diferencia el <code>do while</code> del <code>while</code> normal?</span></div>
+    <button class="reveal-btn">Ver respuesta <span class="chev">▾</span></button>
+    <div class="answer"><div class="inner">El <code>while</code> revisa la condición <b>antes</b> (puede no ejecutarse nunca). El <code>do while</code> ejecuta <b>primero</b> y revisa <b>después</b>, así que siempre corre al menos una vez.</div></div>
+  </div>
+
+  <div class="banner err"><span class="bi">♾️</span><div><b>Ciclo infinito:</b> si en el <code>while</code> olvidas el <code>mesasPorLimpiar--</code>, la condición nunca cambia y el programa repite para siempre (se corta con <code>Ctrl + C</code>). <b>Regla de oro:</b> dentro del ciclo siempre debe cambiar algo que afecte la condición.</div></div>
+
+  <div class="appnow">
+    <div class="an-head"><span class="pill">Así va la app</span> 🧾 El menú se repite</div>
+    <p class="muted">El menú del Cajero ahora se repite hasta que elijas cerrar. ¡Ya se siente una app real!</p>
+    <div class="filechip"><span class="fi">📁</span> <b>Cajero.java</b></div>
+    <div class="code" data-lang="Cajero.java"><pre><code>import java.util.Scanner;
+
+public class Cajero {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int opcion;
+
+        do {
+            System.out.println("\n--- CAJERO ---");
+            System.out.println("1. Nuevo pedido");
+            System.out.println("2. Cerrar caja");
+            System.out.print("Elige una opcion: ");
+            opcion = sc.nextInt();
+
+            switch (opcion) {
+                case 1:
+                    System.out.print("Subtotal: ");
+                    double subtotal = sc.nextDouble();
+                    if (subtotal > 100000) {
+                        System.out.println("Pedido con descuento");
+                    } else {
+                        System.out.println("Pedido sin descuento");
+                    }
+                    break;
+                case 2:
+                    System.out.println("Caja cerrada");
+                    break;
+                default:
+                    System.out.println("Opcion invalida");
+            }
+        } while (opcion != 2);
+    }
+}</code></pre></div>
+  </div>
+</section>
+
+<!-- ============ S5: METODOS ============ -->
+<section class="section" id="metodos" data-title="Métodos" data-icon="🧮">
+  <div class="section-head">
+    <div class="eyebrow">Bloque 4</div>
+    <h2><span class="emoji">🧮</span>Reutilizar lógica: métodos</h2>
+    <p class="lead">El cálculo de propina y total lo necesitas en varias partes del Cajero. ¿Copias la fórmula en cada lugar? Nunca: si cambia, tendrías que corregir varios sitios. La lógica se escribe una vez y se reutiliza llamándola. Eso es un <b>método</b>.</p>
+  </div>
+
+  <div class="card def">
+    <div class="def-t">Definición</div>
+    <p>Un <b>método</b> es un bloque de código con nombre que hace una tarea y se puede invocar cuantas veces quieras.</p>
+  </div>
+  <div class="real"><div class="ri">🍳</div><div><div class="rt">En la vida real</div>Una receta: la escribes una vez y la sigues siempre que la necesites. Los <b>ingredientes</b> son los <b>parámetros</b> (datos que entran); el <b>plato</b> es el <b>retorno</b> (resultado que sale).</div></div>
+
+  <h3><span class="tag">Ej. 1</span>método que calcula la propina</h3>
+  <div class="filechip"><span class="fi">📁</span> Crea <b>Metodos.java</b> · el método va dentro de la clase pero fuera del main</div>
+  <div class="code" data-lang="Metodos.java"><pre><code>public class Metodos {
+    public static void main(String[] args) {
+        double propina = calcularPropina(80000, 0.10);
+        System.out.println("Propina: " + propina);
+    }
+
+    static double calcularPropina(double subtotal, double porcentaje) {
+        return subtotal * porcentaje;
+    }
+}</code></pre></div>
+  <div class="think">
+    <div class="q"><span class="qi">🤔</span><span>¿Por qué va <code>double</code> antes del nombre del método?</span></div>
+    <button class="reveal-btn">Ver respuesta <span class="chev">▾</span></button>
+    <div class="answer"><div class="inner">Es el <b>tipo de dato que el método devuelve</b>. Si fuera <code>void</code>, no devolvería nada. Como entrega un decimal, devuelve <code>double</code>.</div></div>
+  </div>
+
+  <h3><span class="tag">Ej. 2</span>método que devuelve el total con propina</h3>
+  <div class="filechip"><span class="fi">📁</span> En <b>Metodos.java</b> (agrega otro método)</div>
+  <div class="code" data-lang="Java"><pre><code>static double calcularTotal(double subtotal, double porcentaje) {
+    double propina = calcularPropina(subtotal, porcentaje);
+    return subtotal + propina;
+}</code></pre></div>
+  <div class="banner tip"><span class="bi">💡</span><div>Fíjate: <code>calcularTotal</code> <b>reutiliza</b> <code>calcularPropina</code>. Un método puede llamar a otro.</div></div>
+
+  <h3>🧠 Scope (alcance de variables)</h3>
+  <div class="think">
+    <div class="q"><span class="qi">🤔</span><span>La variable <code>propina</code> que está dentro de <code>calcularTotal</code>, ¿puedo usarla en el <code>main</code>?</span></div>
+    <button class="reveal-btn">Ver respuesta <span class="chev">▾</span></button>
+    <div class="answer"><div class="inner"><b>No.</b> <code>propina</code> solo existe dentro de su método; al terminar, desaparece. Eso es el <b>scope</b>: una variable vive únicamente dentro del bloque <code>{ }</code> donde nació. La única forma de sacar un dato del método es el <code>return</code>.</div></div>
+  </div>
+  <div class="real"><div class="ri">🚪</div><div><div class="rt">Analogía</div>Lo que se habla en una sala no existe en la otra. Cada bloque tiene su propio espacio.</div></div>
+  <div class="banner err"><span class="bi">🚫</span><div>Si intentas imprimir <code>propina</code> desde el <code>main</code>, Java marca <i>"cannot find symbol"</i>: no existe en ese espacio. Y si olvidas el <code>return</code> en un método que promete devolver algo → <i>"missing return statement"</i>.</div></div>
+  <div class="banner tip"><span class="bi">❓</span><div><b>¿Qué es <code>static</code>?</b> Por ahora: permite llamar el método directo desde <code>main</code> sin crear un objeto. El porqué profundo llega en la Clase 5 (POO).</div></div>
+
+  <div class="appnow">
+    <div class="an-head"><span class="pill">Así va la app</span> 🧾 El Cajero ya calcula</div>
+    <p class="muted">Calcula el total con un método reutilizable.</p>
+    <div class="filechip"><span class="fi">📁</span> <b>Cajero.java</b></div>
+    <div class="code" data-lang="Cajero.java"><pre><code>import java.util.Scanner;
+
+public class Cajero {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int opcion;
+
+        do {
+            System.out.println("\n--- CAJERO ---");
+            System.out.println("1. Nuevo pedido");
+            System.out.println("2. Cerrar caja");
+            System.out.print("Elige una opcion: ");
+            opcion = sc.nextInt();
+
+            switch (opcion) {
+                case 1:
+                    System.out.print("Subtotal: ");
+                    double subtotal = sc.nextDouble();
+                    double total = calcularTotal(subtotal, 0.10);
+                    System.out.println("Total con propina: " + total);
+                    break;
+                case 2:
+                    System.out.println("Caja cerrada");
+                    break;
+                default:
+                    System.out.println("Opcion invalida");
+            }
+        } while (opcion != 2);
+    }
+
+    static double calcularTotal(double subtotal, double porcentaje) {
+        double propina = subtotal * porcentaje;
+        return subtotal + propina;
+    }
+}</code></pre></div>
+  </div>
+</section>
+
+<!-- ============ S6: ORGANIZACION ============ -->
+<section class="section" id="organizacion" data-title="Organización" data-icon="🧩">
+  <div class="section-head">
+    <div class="eyebrow">Bloque 5</div>
+    <h2><span class="emoji">🧩</span>Organización profesional</h2>
+    <p class="lead">En un restaurante el chef no cobra las cuentas ni el cajero cocina: cada uno tiene una responsabilidad clara. El código profesional es igual — <b>una clase, una responsabilidad</b>. Eso es separación de responsabilidades, base del principio <b>SRP</b> de SOLID que verás formalmente más adelante.</p>
+  </div>
+
+  <div class="figure">
+    <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pedido calcula, Cajero coordina">
+      <g>
+        <rect x="40" y="40" width="250" height="100" rx="14" fill="#1d1633" stroke="#6018F0"/>
+        <text class="svg-text svg-mono" x="60" y="72" font-size="15" fill="#82aaff" font-weight="700">Pedido.java</text>
+        <text class="svg-text" x="60" y="98" font-size="12.5">🍳 La cocina</text>
+        <text class="svg-text" x="60" y="118" font-size="11.5" fill="#a79fc4">sabe calcular el total</text>
+
+        <rect x="410" y="40" width="250" height="100" rx="14" fill="#1d1633" stroke="#6018F0"/>
+        <text class="svg-text svg-mono" x="430" y="72" font-size="15" fill="#c792ea" font-weight="700">Cajero.java</text>
+        <text class="svg-text" x="430" y="98" font-size="12.5">🧑‍🍳 El mesero</text>
+        <text class="svg-text" x="430" y="118" font-size="11.5" fill="#a79fc4">muestra y coordina</text>
+
+        <line x1="410" y1="90" x2="290" y2="90" stroke="#6018F0" stroke-width="2" marker-end="url(#arr)"/>
+        <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#6018F0"/></marker></defs>
+        <text class="svg-text" x="350" y="80" font-size="11" fill="#a79fc4" text-anchor="middle">pide</text>
+      </g>
+    </svg>
+    <div class="cap">El Cajero no sabe <i>cómo</i> se calcula — solo a <i>quién</i> pedírselo.</div>
+  </div>
+
+  <h3>La clase de lógica</h3>
+  <div class="filechip"><span class="fi">📁</span> Crea <b>Pedido.java</b> en la raíz (misma carpeta que Cajero.java)</div>
+  <div class="code" data-lang="Pedido.java"><pre><code>public class Pedido {
+    double calcularTotal(double subtotal, double porcentaje) {
+        double propina = subtotal * porcentaje;
+        return subtotal + propina;
+    }
+}</code></pre></div>
+
+  <h3>La clase principal — versión final</h3>
+  <div class="filechip"><span class="fi">📁</span> <b>Cajero.java</b> queda solo con menú y coordinación</div>
+  <div class="code" data-lang="Cajero.java"><pre><code>import java.util.Scanner;
+
+public class Cajero {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        Pedido pedido = new Pedido();
+        int opcion;
+
+        do {
+            System.out.println("\n--- CAJERO ---");
+            System.out.println("1. Nuevo pedido");
+            System.out.println("2. Cerrar caja");
+            System.out.print("Elige una opcion: ");
+            opcion = sc.nextInt();
+
+            switch (opcion) {
+                case 1:
+                    System.out.print("Subtotal: ");
+                    double subtotal = sc.nextDouble();
+                    double total = pedido.calcularTotal(subtotal, 0.10);
+                    System.out.println("Total con propina: " + total);
+                    break;
+                case 2:
+                    System.out.println("Caja cerrada");
+                    break;
+                default:
+                    System.out.println("Opcion invalida");
+            }
+        } while (opcion != 2);
+    }
+}</code></pre></div>
+  <div class="think">
+    <div class="q"><span class="qi">🤔</span><span>¿Por qué <code>Cajero</code> puede usar <code>calcularTotal</code> si está en otro archivo?</span></div>
+    <button class="reveal-btn">Ver respuesta <span class="chev">▾</span></button>
+    <div class="answer"><div class="inner">Porque creó un <b>objeto</b> <code>Pedido</code> con <code>new Pedido()</code> y a través de él pide el cálculo. <code>Cajero</code> no sabe <i>cómo</i> se calcula —y no le importa—; solo sabe a <b>quién</b> pedírselo. Eso es separar responsabilidades.</div></div>
+  </div>
+
+  <div class="banner warn"><span class="bi">▶️</span><div><b>Importante al ejecutar:</b> selecciona <code>Cajero.java</code> y dale al botón <b>▶ Run / F5</b> de VS Code — compila todo el proyecto junto y funciona. Si corres <code>java Cajero.java</code> directo en la terminal, dará error <i>"cannot find symbol: class Pedido"</i> porque ese comando mira un solo archivo. <b>Usa siempre el botón ▶.</b></div></div>
+  <div class="banner tip"><span class="bi">📌</span><div>Ambos <code>.java</code> van en la <b>raíz</b>, sin carpetas. Todavía no usamos <code>package</code>; eso llega más adelante. ¿Esto ya es POO? Es la antesala: en la Clase 5 le damos nombre completo (clases, objetos, atributos y encapsulación).</div></div>
+</section>
+
+<!-- ============ S7: APP COMPLETA ============ -->
+<section class="section" id="app-final" data-title="App completa" data-icon="✅">
+  <div class="section-head">
+    <div class="eyebrow">Resultado</div>
+    <h2><span class="emoji">✅</span>La app completa</h2>
+    <p class="lead">Estos son los dos archivos finales del Cajero, listos para copiar a tu proyecto. Recuerda: ambos en la raíz, y corre con el botón ▶.</p>
+  </div>
+
+  <div class="filechip"><span class="fi">📁</span> <b>Pedido.java</b></div>
+  <div class="code" data-lang="Pedido.java"><pre><code>public class Pedido {
+    double calcularTotal(double subtotal, double porcentaje) {
+        double propina = subtotal * porcentaje;
+        return subtotal + propina;
+    }
+}</code></pre></div>
+
+  <div class="filechip"><span class="fi">📁</span> <b>Cajero.java</b></div>
+  <div class="code" data-lang="Cajero.java"><pre><code>import java.util.Scanner;
+
+public class Cajero {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        Pedido pedido = new Pedido();
+        int opcion;
+
+        do {
+            System.out.println("\n--- CAJERO ---");
+            System.out.println("1. Nuevo pedido");
+            System.out.println("2. Cerrar caja");
+            System.out.print("Elige una opcion: ");
+            opcion = sc.nextInt();
+
+            switch (opcion) {
+                case 1:
+                    System.out.print("Subtotal: ");
+                    double subtotal = sc.nextDouble();
+                    double total = pedido.calcularTotal(subtotal, 0.10);
+                    System.out.println("Total con propina: " + total);
+                    break;
+                case 2:
+                    System.out.println("Caja cerrada");
+                    break;
+                default:
+                    System.out.println("Opcion invalida");
+            }
+        } while (opcion != 2);
+    }
+}</code></pre></div>
+
+  <div class="banner tip"><span class="bi">🔮</span><div><b>Lo que viene en la Clase 4:</b> tenemos un Cajero que funciona. Le falta <b>validar</b> la entrada (que no se caiga si escriben letras donde van números) y <b>publicarlo en GitHub</b>. Eso es el Mini proyecto CLI App, donde puliremos este mismo Cajero y lo subiremos a un repositorio.</div></div>
+</section>
+
+<!-- ============ S8: PRACTICA ============ -->
+<section class="section" id="practica" data-title="Práctica" data-icon="🧪">
+  <div class="section-head">
+    <div class="eyebrow">Para reforzar</div>
+    <h2><span class="emoji">🧪</span>Ejercicios de práctica</h2>
+    <p class="lead">Cada uno entrena un solo tema. Hazlos en archivos sueltos para afianzar lo que vimos hoy.</p>
+  </div>
+  <div class="ex-grid">
+    <div class="ex"><div class="ex-h"><div class="ex-n">A</div><div class="ex-t">Condicionales</div></div><p>Pide la edad con <code>Scanner</code> e imprime "Menor de edad" si es menor a 18, "Adulto" entre 18 y 64, "Adulto mayor" si es 65 o más.</p></div>
+    <div class="ex"><div class="ex-h"><div class="ex-n">B</div><div class="ex-t">Operadores lógicos</div></div><p>Pide si el usuario tiene licencia (true/false) y su edad. Imprime "Puede conducir" solo si tiene licencia <b>Y</b> es mayor de 18.</p></div>
+    <div class="ex"><div class="ex-h"><div class="ex-n">C</div><div class="ex-t">switch con String</div></div><p>Pide un día de la semana como texto e imprime "Laboral" o "Fin de semana" según corresponda, usando un <code>switch</code> sobre <code>String</code>.</p></div>
+    <div class="ex"><div class="ex-h"><div class="ex-n">D</div><div class="ex-t">Ciclo for</div></div><p>Imprime los números pares del 2 al 20 usando un <code>for</code>.</p></div>
+    <div class="ex"><div class="ex-h"><div class="ex-n">E</div><div class="ex-t">Ciclo while</div></div><p>Simula una cuenta regresiva desde un número que pida el usuario hasta 0, imprimiendo "¡Despegue!" al final.</p></div>
+    <div class="ex"><div class="ex-h"><div class="ex-n">F</div><div class="ex-t">do while</div></div><p>Pide un número entre 1 y 5; si está fuera de rango, vuelve a pedirlo. Solo termina cuando el dato es válido.</p></div>
+    <div class="ex"><div class="ex-h"><div class="ex-n">G</div><div class="ex-t">Métodos</div></div><p>Crea un método <code>esPar(int numero)</code> que devuelva <code>true</code> si el número es par y <code>false</code> si no. Pruébalo con tres números desde el main.</p></div>
+    <div class="ex"><div class="ex-h"><div class="ex-n">H</div><div class="ex-t">Conversión de tipos</div></div><p>Pide un precio con decimales (<code>nextDouble()</code>) y muéstralo redondeado hacia abajo convirtiéndolo a <code>int</code>. Explica qué pasó con los decimales.</p></div>
+  </div>
+</section>
+
+  </main>
+  <footer class="foot">
+    © 2026 Ana Alvarado · Educadora Tech &amp; Desarrolladora Full Stack ·
+    <a href="https://linkedin.com/in/ana-alvarado-instructora-full-stack" target="_blank" rel="noopener">linkedin.com/in/ana-alvarado-instructora-full-stack</a>
+  </footer>
+</div>
+</div>
+
+<!-- PRESENTATION HUD -->
+<div class="present-hud">
+  <button class="ph-nav" id="phPrev">‹</button>
+  <span class="ph-count" id="phCount">1 / 1</span>
+  <button class="ph-nav" id="phNext">›</button>
+  <span class="ph-exit">salir <kbd>Esc</kbd></span>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- BUILD NAV FROM SECTIONS ---------- */
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.section'));
+  var nav = document.getElementById('nav');
+  sections.forEach(function(sec){
+    var a = document.createElement('a');
+    a.href = '#' + sec.id;
+    a.dataset.target = sec.id;
+    a.innerHTML = '<span class="ic">'+(sec.dataset.icon||'•')+'</span><span>'+sec.dataset.title+'</span><span class="dot"></span>';
+    nav.appendChild(a);
+  });
+  var navLinks = Array.prototype.slice.call(nav.querySelectorAll('a'));
+
+  /* ---------- SYNTAX HIGHLIGHT (Java) ----------
+     Protege strings y comentarios ANTES de resaltar keywords,
+     para evitar que un token rompa otro. */
+  var KEYWORDS = ['public','private','protected','static','void','class','new','return','import','package','if','else','switch','case','break','default','for','while','do','int','double','boolean','char','long','short','byte','float','String','true','false','null','this'];
+  var TYPES = ['String','Scanner','System','Integer','Double','Boolean','Character'];
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function highlight(raw){
+    var tokens = [];
+    // Index is stored OUTSIDE the digits region using letters, so the number
+    // rule (\b\d+\b) and keyword rules can never corrupt a placeholder.
+    function stash(html){ tokens.push(html); return '\uE000z' + (tokens.length-1) + 'z\uE001'; }
+    var SENT = '\uE000';
+
+    function plainOnly(s, fn){
+      // apply fn only to text that is NOT inside a placeholder
+      return s.split(/(\uE000z\d+z\uE001)/).map(function(part){
+        return /^\uE000z\d+z\uE001$/.test(part) ? part : fn(part);
+      }).join('');
+    }
+
+    var src = escapeHtml(raw);
+
+    // 1. protect comments, strings, chars (highest priority)
+    src = src.replace(/\/\/[^\n]*/g, function(m){ return stash('<span class="tok-com">'+m+'</span>'); });
+    src = src.replace(/"(?:[^"\\]|\\.)*"/g, function(m){ return stash('<span class="tok-str">'+m+'</span>'); });
+    src = src.replace(/'(?:[^'\\]|\\.)'/g, function(m){ return stash('<span class="tok-str">'+m+'</span>'); });
+
+    // 2. keywords & types, only on plain segments
+    KEYWORDS.forEach(function(k){
+      var cls = TYPES.indexOf(k) !== -1 ? 'tok-type' : 'tok-key';
+      var re = new RegExp('\\b'+k+'\\b','g');
+      src = plainOnly(src, function(t){ return t.replace(re, function(m){ return stash('<span class="'+cls+'">'+m+'</span>'); }); });
+    });
+    TYPES.forEach(function(t0){
+      var re = new RegExp('\\b'+t0+'\\b','g');
+      src = plainOnly(src, function(t){ return t.replace(re, function(m){ return stash('<span class="tok-type">'+m+'</span>'); }); });
+    });
+
+    // 3. method calls name(
+    src = plainOnly(src, function(t){
+      return t.replace(/([a-zA-Z_][a-zA-Z0-9_]*)(\s*\()/g, function(m, name, paren){
+        return '<span class="tok-fn">'+name+'</span>' + paren;
+      });
+    });
+
+    // 4. numbers
+    src = plainOnly(src, function(t){
+      return t.replace(/\b\d+(\.\d+)?\b/g, function(m){ return '<span class="tok-num">'+m+'</span>'; });
+    });
+
+    // 5. restore (loop; stashed html may contain nested placeholders)
+    var guard = 0;
+    while(src.indexOf(SENT) !== -1 && guard < 60){
+      src = src.replace(/\uE000z(\d+)z\uE001/g, function(_, i){ return tokens[+i]; });
+      guard++;
+    }
+    return src;
+  }
+
+  document.querySelectorAll('.code').forEach(function(box){
+    var pre = box.querySelector('pre');
+    var codeEl = pre.querySelector('code');
+    var raw = codeEl.textContent;
+    codeEl.dataset.raw = raw;
+    codeEl.innerHTML = highlight(raw);
+
+    // build top bar with copy button
+    var lang = box.dataset.lang || 'Java';
+    var top = document.createElement('div');
+    top.className = 'code-top';
+    top.innerHTML = '<span class="dots"><i></i><i></i><i></i></span><span class="lang">'+lang+'</span>';
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copiar';
+    btn.addEventListener('click', function(){
+      var text = codeEl.dataset.raw;
+      function done(){ btn.textContent='✓ Copiado'; btn.classList.add('done'); setTimeout(function(){btn.textContent='Copiar';btn.classList.remove('done');},1600); }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else { fallback(); }
+      function fallback(){
+        var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+        document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){}document.body.removeChild(ta);
+      }
+    });
+    top.appendChild(btn);
+    box.insertBefore(top, pre);
+  });
+
+  /* ---------- REVEAL ANSWERS ---------- */
+  document.querySelectorAll('.reveal-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var ans = btn.parentElement.querySelector('.answer');
+      var open = ans.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      btn.childNodes[0].nodeValue = open ? 'Ocultar respuesta ' : 'Ver respuesta ';
+    });
+  });
+
+  /* ---------- PROGRESS + ACTIVE SECTION ---------- */
+  var seen = {};
+  var bar = document.getElementById('progressBar');
+  var pct = document.getElementById('progressPct');
+  function updateProgress(){
+    var n = Object.keys(seen).length;
+    var p = Math.round(n / sections.length * 100);
+    bar.style.width = p + '%';
+    pct.textContent = p + '%';
+  }
+  function markSeen(id){
+    if(!seen[id]){ seen[id]=true; updateProgress(); }
+    var link = navLinks.filter(function(a){return a.dataset.target===id;})[0];
+    if(link) link.classList.add('seen');
+  }
+  function setActive(id){
+    navLinks.forEach(function(a){ a.classList.toggle('active', a.dataset.target===id); });
+  }
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        setActive(e.target.id);
+        markSeen(e.target.id);
+      }
+    });
+  }, {rootMargin:'-45% 0px -45% 0px', threshold:0});
+  sections.forEach(function(s){ io.observe(s); });
+  markSeen(sections[0].id);
+
+  navLinks.forEach(function(a){
+    a.addEventListener('click', function(){ closeSidebar(); });
+  });
+
+  /* ---------- MOBILE SIDEBAR ---------- */
+  var sidebar = document.getElementById('sidebar');
+  var backdrop = document.getElementById('backdrop');
+  document.getElementById('menuToggle').addEventListener('click', function(){
+    sidebar.classList.add('open'); backdrop.classList.add('show');
+  });
+  function closeSidebar(){ sidebar.classList.remove('open'); backdrop.classList.remove('show'); }
+  backdrop.addEventListener('click', closeSidebar);
+
+  /* ---------- PRESENTATION MODE ---------- */
+  var presenting = false, slideIndex = 0;
+  var hudCount = document.getElementById('phCount');
+  var presentProgress = document.getElementById('presentProgress');
+
+  function showSlide(i){
+    slideIndex = Math.max(0, Math.min(sections.length-1, i));
+    sections.forEach(function(s,idx){ s.classList.toggle('slide-active', idx===slideIndex); });
+    hudCount.textContent = (slideIndex+1) + ' / ' + sections.length;
+    presentProgress.style.width = ((slideIndex+1)/sections.length*100) + '%';
+    markSeen(sections[slideIndex].id);
+    setActive(sections[slideIndex].id);
+    var active = sections[slideIndex];
+    if(active) active.scrollTop = 0;
+  }
+  function enterPresent(){
+    presenting = true;
+    document.body.classList.add('present');
+    var current = 0;
+    sections.forEach(function(s,idx){ if(s.classList.contains('active-view')) current=idx; });
+    // start from section nearest viewport
+    var best=0,bestDist=Infinity;
+    sections.forEach(function(s,idx){ var d=Math.abs(s.getBoundingClientRect().top); if(d<bestDist){bestDist=d;best=idx;} });
+    showSlide(best);
+    if(document.documentElement.requestFullscreen){ document.documentElement.requestFullscreen().catch(function(){}); }
+  }
+  function exitPresent(){
+    presenting = false;
+    document.body.classList.remove('present');
+    sections.forEach(function(s){ s.classList.remove('slide-active'); });
+    if(document.fullscreenElement && document.exitFullscreen){ document.exitFullscreen().catch(function(){}); }
+  }
+  function togglePresent(){ presenting ? exitPresent() : enterPresent(); }
+
+  document.getElementById('presentBtn').addEventListener('click', togglePresent);
+  document.getElementById('phNext').addEventListener('click', function(){ showSlide(slideIndex+1); });
+  document.getElementById('phPrev').addEventListener('click', function(){ showSlide(slideIndex-1); });
+
+  document.addEventListener('keydown', function(e){
+    var tag = (e.target.tagName||'').toLowerCase();
+    if(tag==='input'||tag==='textarea') return;
+    if(e.key==='p'||e.key==='P'){ if(!presenting){ e.preventDefault(); enterPresent(); } }
+    else if(presenting){
+      if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '||e.key==='PageDown'){ e.preventDefault(); showSlide(slideIndex+1); }
+      else if(e.key==='ArrowLeft'||e.key==='ArrowUp'||e.key==='PageUp'){ e.preventDefault(); showSlide(slideIndex-1); }
+      else if(e.key==='Escape'){ exitPresent(); }
+      else if(e.key==='Home'){ showSlide(0); }
+      else if(e.key==='End'){ showSlide(sections.length-1); }
+    }
+  });
+  document.addEventListener('fullscreenchange', function(){
+    if(!document.fullscreenElement && presenting){ exitPresent(); }
+  });
+
+  updateProgress();
+})();
+
+</script>
+</body>
+</html>
