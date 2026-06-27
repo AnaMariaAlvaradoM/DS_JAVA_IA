@@ -23,6 +23,5 @@ public class Ciclos {
         } while (opcion != 2);
 
         System.out.println("Saliste del menu");
-    }
-    
+    }   
 }

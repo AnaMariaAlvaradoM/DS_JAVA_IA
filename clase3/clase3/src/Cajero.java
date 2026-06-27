@@ -3,6 +3,7 @@ import java.util.Scanner;
 public class Cajero {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
+        Pedido pedido = new Pedido();
         int opcion;
 
         do {
@@ -16,11 +17,8 @@ public class Cajero {
                 case 1:
                     System.out.print("Subtotal: ");
                     double subtotal = sc.nextDouble();
-                    if (subtotal > 100000) {
-                        System.out.println("Pedido con descuento");
-                    } else {
-                        System.out.println("Pedido sin descuento");
-                    }
+                    double total = pedido.calcularTotal(subtotal, 0.10);
+                    System.out.println("Total con propina: " + total);
                     break;
                 case 2:
                     System.out.println("Caja cerrada");
@@ -31,4 +29,3 @@ public class Cajero {
         } while (opcion != 2);
     }
 }
-        

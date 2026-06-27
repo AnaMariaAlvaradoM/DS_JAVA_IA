@@ -8,5 +8,10 @@ public class Metodos {
         return subtotal * porcentaje;
     }
 
+    public static double calcularTotal(double subtotal, double porcentaje) {
+    double propina = calcularPropina(subtotal, porcentaje);
+    return subtotal + propina;
+    }
+
     
 }
